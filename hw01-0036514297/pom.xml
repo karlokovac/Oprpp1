@@ -4,12 +4,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>oprpp1.p02</groupId>
-	<artifactId>demo</artifactId>
+	<groupId>hr.fer.oprpp1.jmbag0036514297</groupId>
+	<artifactId>hw01-0036514297</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>Sortiranje brojeva</name>
+	<name>Prva domaca zadaca</name>
      
 	<properties>
 		<maven.compiler.source>16</maven.compiler.source>
@@ -26,6 +26,6 @@
 		    <scope>test</scope>
 		</dependency>
 	</dependencies>
-	
-	
+
 </project>
+
