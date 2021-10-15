@@ -43,11 +43,24 @@ public class ArrayIndexedCollectionTest {
 	}
 
 	@Test
-	public void testCollectionAndCapacityConstructor() {
-		var collection = new ArrayIndexedCollection();
-		assertThrows(IllegalArgumentException.class, () -> {
-			new ArrayIndexedCollection(0);
+	public void testCollectionConstructorShouldThrow() {
+		assertThrows(NullPointerException.class, () -> {
+			new ArrayIndexedCollection(null);
 		});
+	}
+	
+	@Test
+	public void testCollectionAndCapacityConstructor() {
+		var col = new ArrayIndexedCollection();
+		var volkswagen = "Volkswagen";
+		var mercedes = "Mercedes";
+		var bmw = "BMW";
+		Object[] expected = new Object[] { volkswagen, mercedes, bmw };
+		col.add(volkswagen);
+		col.add(mercedes);
+		col.add(bmw);
+		var collection = new ArrayIndexedCollection(col,0);
+		assertArrayEquals(expected, collection.toArray());
 	}
 
 	@Test
