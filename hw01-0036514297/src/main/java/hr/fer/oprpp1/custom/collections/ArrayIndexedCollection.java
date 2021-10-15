@@ -96,7 +96,7 @@ public class ArrayIndexedCollection extends Collection {
 
 	@Override
 	public Object[] toArray() {
-		throw new UnsupportedOperationException("Not implemented");
+		return Arrays.copyOf(elements, size);
 	}
 
 	@Override

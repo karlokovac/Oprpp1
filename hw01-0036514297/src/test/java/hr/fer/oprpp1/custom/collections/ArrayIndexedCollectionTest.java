@@ -1,5 +1,6 @@
 package hr.fer.oprpp1.custom.collections;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -61,13 +62,38 @@ public class ArrayIndexedCollectionTest {
 		collection.clear();
 		assertTrue(collection.isEmpty());
 	}
-	
+
 	@Test
 	public void testInsert() {
 		var collection = new ArrayIndexedCollection();
-		var expected = "Rimac";
-		collection.add(expected);
-		collection.insert("Tesla", 0);
-		assertEquals(expected,collection.get(1));
+		var tesla = "Tesla";
+		var rimac = "Rimac";
+		Object[] expected = new Object[] { rimac, tesla };
+		collection.add(tesla);
+		collection.insert(rimac, 0);
+		assertArrayEquals(expected, collection.toArray());
+	}
+
+	@Test
+	public void testIndexOf() {
+		var collection = new ArrayIndexedCollection();
+		var shelby = "Shelby";
+		collection.add("Chevy");
+		collection.add(shelby);
+		assertEquals(1, collection.indexOf(shelby));
+	}
+
+	@Test
+	public void testRemove() {
+		var collection = new ArrayIndexedCollection();
+		var tesla = "Tesla";
+		var rimac = "Rimac";
+		var porsche = "Porsche";
+		Object[] expected = new Object[] { rimac, porsche };
+		collection.add(tesla);
+		collection.add(rimac);
+		collection.add(porsche);
+		collection.remove(0);
+		assertArrayEquals(expected, collection.toArray());
 	}
 }
