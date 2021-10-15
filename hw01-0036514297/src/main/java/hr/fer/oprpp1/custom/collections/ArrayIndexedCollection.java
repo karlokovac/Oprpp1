@@ -24,20 +24,20 @@ public class ArrayIndexedCollection extends Collection {
 	}
 
 	public ArrayIndexedCollection(Collection other) {
-		this(other, 0);
+		this(other, MIN_SIZE);
 	}
 
 	public ArrayIndexedCollection(Collection other, int initialCapacity) {
 		requireNonNull(other);
-		elements = Arrays.copyOf(other.toArray(), other.size() > initialCapacity ? other.size() : initialCapacity);
+		size = (other.size() > initialCapacity) ? other.size() : initialCapacity;
+		elements = Arrays.copyOf(other.toArray(), size);
 	}
 
 	@Override
 	public void add(Object value) {
 		requireNonNull(value);
 		reallocateIfFull();
-		addToFirstEmpty(value);
-		size++;
+		elements[size++] = value;
 	}
 
 	public Object get(int index) {
@@ -52,8 +52,8 @@ public class ArrayIndexedCollection extends Collection {
 	}
 
 	public void insert(Object value, int position) {
-		requireNonNull(value);
 		checkIndex(position, size + 1);
+		requireNonNull(value);
 		reallocateIfFull();
 		shiftRightFrom(position);
 		elements[position] = value;
@@ -101,20 +101,13 @@ public class ArrayIndexedCollection extends Collection {
 
 	@Override
 	public void forEach(Processor processor) {
+		for(int i=0;i<size;i++)
+			processor.process(elements[i]);
 	}
 
 	private void reallocateIfFull() {
 		if (size == elements.length)
 			elements = Arrays.copyOf(elements, elements.length * 2);
-	}
-
-	private void addToFirstEmpty(Object value) {
-		for (int i = 0; i < elements.length; i++) {
-			if (elements[i] == null) {
-				elements[i] = value;
-				return;
-			}
-		}
 	}
 
 	private void shiftRightFrom(int position) {

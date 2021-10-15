@@ -10,9 +10,44 @@ import org.junit.jupiter.api.Test;
 public class ArrayIndexedCollectionTest {
 
 	@Test
-	public void testIfNewEmpty() {
+	public void testDefaultConstructor() {
 		var collection = new ArrayIndexedCollection();
 		assertTrue(collection.isEmpty());
+	}
+
+	@Test
+	public void testCapacityConstructor() {
+		var collection = new ArrayIndexedCollection(2);
+		assertTrue(collection.isEmpty());
+	}
+
+	@Test
+	public void testCapacityConstructorShouldThrow() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			new ArrayIndexedCollection(0);
+		});
+	}
+
+	@Test
+	public void testCollectionConstructor() {
+		var col = new ArrayIndexedCollection();
+		var volkswagen = "Volkswagen";
+		var mercedes = "Mercedes";
+		var bmw = "BMW";
+		Object[] expected = new Object[] { volkswagen, mercedes, bmw };
+		col.add(volkswagen);
+		col.add(mercedes);
+		col.add(bmw);
+		var collection = new ArrayIndexedCollection(col);
+		assertArrayEquals(expected, collection.toArray());
+	}
+
+	@Test
+	public void testCollectionAndCapacityConstructor() {
+		var collection = new ArrayIndexedCollection();
+		assertThrows(IllegalArgumentException.class, () -> {
+			new ArrayIndexedCollection(0);
+		});
 	}
 
 	@Test
@@ -64,13 +99,24 @@ public class ArrayIndexedCollectionTest {
 	}
 
 	@Test
-	public void testInsert() {
+	public void testInsertOne() {
+		var collection = new ArrayIndexedCollection();
+		var rimac = "Rimac";
+		Object[] expected = new Object[] { rimac };
+		collection.insert(rimac, 0);
+		assertArrayEquals(expected, collection.toArray());
+	}
+
+	@Test
+	public void testInsertInThMiddle() {
 		var collection = new ArrayIndexedCollection();
 		var tesla = "Tesla";
+		var porsche = "Porsche";
 		var rimac = "Rimac";
-		Object[] expected = new Object[] { rimac, tesla };
-		collection.add(tesla);
-		collection.insert(rimac, 0);
+		Object[] expected = new Object[] { rimac, tesla, porsche };
+		collection.add(rimac);
+		collection.add(porsche);
+		collection.insert(tesla, 1);
 		assertArrayEquals(expected, collection.toArray());
 	}
 
