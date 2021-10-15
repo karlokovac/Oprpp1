@@ -67,6 +67,7 @@ public class Collection {
 	 */
 	public void addAll(Collection other) {
 		class Adder extends Processor {
+			@Override
 			public void process(Object value) {
 				add(value);
 			}
