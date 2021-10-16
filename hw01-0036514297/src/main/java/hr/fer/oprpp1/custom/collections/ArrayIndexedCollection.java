@@ -29,8 +29,8 @@ public class ArrayIndexedCollection extends Collection {
 
 	public ArrayIndexedCollection(Collection other, int initialCapacity) {
 		requireNonNull(other);
-		size = (other.size() > initialCapacity) ? other.size() : initialCapacity;
-		elements = Arrays.copyOf(other.toArray(), size);
+		size=other.size();
+		elements = Arrays.copyOf(other.toArray(), Math.max(initialCapacity, size));
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class ArrayIndexedCollection extends Collection {
 
 	@Override
 	public void forEach(Processor processor) {
-		for(int i=0;i<size;i++)
+		for (int i = 0; i < size; i++)
 			processor.process(elements[i]);
 	}
 
