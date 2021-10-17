@@ -72,7 +72,8 @@ public class Collection {
 				add(value);
 			}
 		}
-		forEach(new Adder());
+		Processor adder = new Adder();
+		other.forEach(adder);
 	}
 
 	/**

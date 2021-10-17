@@ -16,6 +16,8 @@ public class LinkedListIndexedCollection extends Collection {
 		}
 	}
 
+	private static final int VALUE_IS_NOT_FOUND = -1;
+
 	private int size;
 	private ListNode first;
 	private ListNode last;
@@ -27,7 +29,9 @@ public class LinkedListIndexedCollection extends Collection {
 	}
 
 	public LinkedListIndexedCollection(Collection other) {
-
+		this();
+		requireNonNull(other);
+		addAll(other);
 	}
 
 	@Override
@@ -45,23 +49,23 @@ public class LinkedListIndexedCollection extends Collection {
 	public Object get(int index) {
 		checkIndex(index, size);
 		ListNode node;
-		if(index<=size/2) {
+		if (index <= size / 2) {
 			node = first;
-			for(int i=0;i<index;i++)
-				node=node.next;
-		}else {
+			for (int i = 0; i < index; i++)
+				node = node.next;
+		} else {
 			node = last;
-			for(int i=size;i>index;i--)
-				node=node.previous;
+			for (int i = size; i > index; i--)
+				node = node.previous;
 		}
 		return node.value;
 	}
 
 	@Override
 	public void clear() {
-		first=null;
-		last=null;
-		size=0;
+		first = null;
+		last = null;
+		size = 0;
 	}
 
 	public void insert(Object value, int position) {
@@ -69,7 +73,13 @@ public class LinkedListIndexedCollection extends Collection {
 	}
 
 	public int indexOf(Object value) {
-		return 0;
+		if (value != null) {
+			var node = first;
+			for (int i = 0; i < size; i++, node = node.next)
+				if (node.value.equals(value))
+					return i;
+		}
+		return VALUE_IS_NOT_FOUND;
 	}
 
 	public void remove(int index) {
@@ -83,7 +93,7 @@ public class LinkedListIndexedCollection extends Collection {
 
 	@Override
 	public boolean contains(Object value) {
-		return false;
+		return indexOf(value) != VALUE_IS_NOT_FOUND;
 	}
 
 	@Override
@@ -93,10 +103,17 @@ public class LinkedListIndexedCollection extends Collection {
 
 	@Override
 	public Object[] toArray() {
-		throw new UnsupportedOperationException("Not implemented");
+		Object[] array = new Object[size];
+		ListNode node = first;
+		for (int i = 0; i < size; i++, node = node.next)
+			array[i] = node.value;
+		return array;
 	}
 
 	@Override
 	public void forEach(Processor processor) {
+		for (var node = first; node != null; node = node.next) {
+			processor.process(node.value);
+		}
 	}
 }
