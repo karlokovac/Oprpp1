@@ -22,7 +22,7 @@ public class ArrayIndexedCollection extends Collection {
 	 */
 	private static final int VALUE_IS_NOT_FOUND = -1;
 	/**
-	 * Default size of internal array 
+	 * Default size of internal array
 	 */
 	private static final int DEFAULT_CAPACITY = 16;
 	/**
@@ -39,6 +39,7 @@ public class ArrayIndexedCollection extends Collection {
 
 	/**
 	 * Constructor with arbitrary size
+	 * 
 	 * @param initialCapacity of the array
 	 */
 	public ArrayIndexedCollection(int initialCapacity) {
@@ -47,16 +48,32 @@ public class ArrayIndexedCollection extends Collection {
 		elements = new Object[initialCapacity];
 	}
 
+	/**
+	 * Constructor for supplying another <code>Collection</code> to be added
+	 * 
+	 * @param other <code>Collection</code> to be added
+	 */
 	public ArrayIndexedCollection(Collection other) {
 		this(other, MIN_SIZE);
 	}
 
+	/**
+	 * Constructor for supplying another <code>Collection</code> along with initial
+	 * capacity to be used for memory allocation
+	 * 
+	 * @param other           <code>Collection</code> to be added
+	 * @param initialCapacity of the array
+	 * @throws NullPointerException if <code>other</code> is null
+	 */
 	public ArrayIndexedCollection(Collection other, int initialCapacity) {
 		requireNonNull(other);
 		size = other.size();
 		elements = Arrays.copyOf(other.toArray(), Math.max(initialCapacity, size));
 	}
 
+	/**
+	 * @throws NullPointerException if <code>value</code> is <code>null</code>
+	 */
 	@Override
 	public void add(Object value) {
 		requireNonNull(value);
@@ -64,6 +81,14 @@ public class ArrayIndexedCollection extends Collection {
 		elements[size++] = value;
 	}
 
+	/**
+	 * Returns the object that is stored in backing array at position index. Valid
+	 * indexes are 0 to size-1
+	 * 
+	 * @param index of the position
+	 * @return <code>Object</code> to be returned
+	 * @throws IndexOutOfBoundsException if <code>index</code> is missused
+	 */
 	public Object get(int index) {
 		checkIndex(index, size);
 		return elements[index];
@@ -75,6 +100,15 @@ public class ArrayIndexedCollection extends Collection {
 		size = 0;
 	}
 
+	/**
+	 * Inserts (does not overwrite) the given value at the given position in array.
+	 * The legal positions are 0 to <code>size</code> (both are included)
+	 * 
+	 * @param value    to be inserted
+	 * @param position to be placed
+	 * @throws NullPointerException if <code>value</code> is <code>null</code>
+	 * @throws IndexOutOfBoundsException if position is missused
+	 */
 	public void insert(Object value, int position) {
 		checkIndex(position, size + 1);
 		requireNonNull(value);
@@ -84,6 +118,13 @@ public class ArrayIndexedCollection extends Collection {
 		size++;
 	}
 
+	/**
+	 * Searches the collection and returns the index of the first occurrence of the
+	 * given value or -1 if the value is not found
+	 * 
+	 * @param value to be searched for
+	 * @return position of the element
+	 */
 	public int indexOf(Object value) {
 		if (value != null)
 			for (int i = 0; i < elements.length; i++)
@@ -92,17 +133,16 @@ public class ArrayIndexedCollection extends Collection {
 		return VALUE_IS_NOT_FOUND;
 	}
 
-	@Override
-	public boolean remove(Object value) {
-		int index = indexOf(value);
-		if (index != VALUE_IS_NOT_FOUND) {
-			remove(index);
-			return true;
-		}
-		return false;
-	}
-
+	/**
+	 * Removes element at specified index from collection. Element that was
+	 * previously at location <code>index+1</code> after this operation is on
+	 * location index , etc. Legal indexes are 0 to <code>size-1</code>
+	 * 
+	 * @param index position of the element
+	 * @throws IndexOutOfBoundsException if <code>index</code> is misused
+	 */
 	public void remove(int index) {
+		checkIndex(index, size);
 		elements[index] = null;
 		shiftLeftFrom(index);
 		size--;
@@ -119,6 +159,16 @@ public class ArrayIndexedCollection extends Collection {
 	}
 
 	@Override
+	public boolean remove(Object value) {
+		int index = indexOf(value);
+		if (index != VALUE_IS_NOT_FOUND) {
+			remove(index);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public Object[] toArray() {
 		return Arrays.copyOf(elements, size);
 	}
@@ -129,20 +179,34 @@ public class ArrayIndexedCollection extends Collection {
 			processor.process(elements[i]);
 	}
 
+	/**
+	 * Duplicates backing array if it's full
+	 */
 	private void reallocateIfFull() {
 		if (size == elements.length)
 			elements = Arrays.copyOf(elements, elements.length * 2);
 	}
 
+	/**
+	 * Shifts elements in the array to the right from the starting position to end
+	 * 
+	 * @param position starting position
+	 */
 	private void shiftRightFrom(int position) {
 		for (int i = size; i > position; i--) {
 			elements[i] = elements[i - 1];
 		}
 	}
 
+	/**
+	 * Shifts elements in the array to the left from the starting position to end
+	 * 
+	 * @param position starting position
+	 */
 	private void shiftLeftFrom(int position) {
 		for (int i = position; i < size; i++) {
 			elements[i] = elements[i + 1];
 		}
 	}
+
 }

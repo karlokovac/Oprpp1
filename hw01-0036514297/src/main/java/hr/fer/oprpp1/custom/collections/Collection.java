@@ -32,7 +32,7 @@ public class Collection {
 	/**
 	 * Adds the given object into this collection
 	 * 
-	 * @param <code>Object</code> to be added
+	 * @param value to be added
 	 */
 	public void add(Object value) {
 	}
@@ -42,6 +42,7 @@ public class Collection {
 	 * determined by <code>equals</code> method
 	 * 
 	 * @param value <code>Object</code> to be searched
+	 * @return boolean indicating presence
 	 */
 	public boolean contains(Object value) {
 		return false;
@@ -49,9 +50,10 @@ public class Collection {
 
 	/**
 	 * Returns <code>true</code> only if the collection contains given value as determined by
-	 * <code>equals</code> method and removes one occurence of it
+	 * <code>equals</code> method and removes one occurrence of it
 	 * 
-	 * @param value <code>Object</code> to remove 
+	 * @param value <code>Object</code> to remove
+	 * @return boolean indicating removal of an <code>Object</code>
 	 */
 	public boolean remove(Object value) {
 		return false;
