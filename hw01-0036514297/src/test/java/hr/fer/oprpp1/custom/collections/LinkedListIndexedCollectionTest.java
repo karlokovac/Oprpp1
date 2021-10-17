@@ -72,7 +72,7 @@ public class LinkedListIndexedCollectionTest {
 		collection.clear();
 		assertTrue(collection.isEmpty());
 	}
-/*
+
 	@Test
 	public void testInsertOne() {
 		var collection = new LinkedListIndexedCollection();
@@ -94,7 +94,7 @@ public class LinkedListIndexedCollectionTest {
 		collection.insert(tesla, 1);
 		assertArrayEquals(expected, collection.toArray());
 	}
-
+	
 	@Test
 	public void testIndexOf() {
 		var collection = new LinkedListIndexedCollection();
@@ -117,5 +117,5 @@ public class LinkedListIndexedCollectionTest {
 		collection.remove(0);
 		assertArrayEquals(expected, collection.toArray());
 	}
-*/
+
 }

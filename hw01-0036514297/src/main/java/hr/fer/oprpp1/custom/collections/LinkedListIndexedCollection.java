@@ -37,28 +37,12 @@ public class LinkedListIndexedCollection extends Collection {
 	@Override
 	public void add(Object value) {
 		requireNonNull(value);
-		ListNode element = new ListNode(last, null, value);
-		if (isEmpty())
-			first = element;
-		else
-			last.next = element;
-		last = element;
-		size++;
+		append(value);
 	}
 
 	public Object get(int index) {
 		checkIndex(index, size);
-		ListNode node;
-		if (index <= size / 2) {
-			node = first;
-			for (int i = 0; i < index; i++)
-				node = node.next;
-		} else {
-			node = last;
-			for (int i = size; i > index; i--)
-				node = node.previous;
-		}
-		return node.value;
+		return getNode(index).value;
 	}
 
 	@Override
@@ -69,7 +53,16 @@ public class LinkedListIndexedCollection extends Collection {
 	}
 
 	public void insert(Object value, int position) {
+		requireNonNull(value);
+		checkIndex(position, size + 1);
 
+		if (position == size)
+			append(value);
+		else if (position == 0) {
+			prepend(value);
+		} else {
+			insertInTheMiddle(value, position);
+		}
 	}
 
 	public int indexOf(Object value) {
@@ -83,7 +76,8 @@ public class LinkedListIndexedCollection extends Collection {
 	}
 
 	public void remove(int index) {
-
+		checkIndex(index, size);
+		removeNode(getNode(index));
 	}
 
 	@Override
@@ -98,6 +92,11 @@ public class LinkedListIndexedCollection extends Collection {
 
 	@Override
 	public boolean remove(Object value) {
+		int index = indexOf(value);
+		if (index != VALUE_IS_NOT_FOUND) {
+			remove(index);
+			return true;
+		}
 		return false;
 	}
 
@@ -114,6 +113,69 @@ public class LinkedListIndexedCollection extends Collection {
 	public void forEach(Processor processor) {
 		for (var node = first; node != null; node = node.next) {
 			processor.process(node.value);
+		}
+	}
+
+	private void append(Object value) {
+		ListNode element = new ListNode(last, null, value);
+		if (isEmpty())
+			first = element;
+		else
+			last.next = element;
+		last = element;
+		size++;
+	}
+
+	/**
+	 * @param value to prepend to the beginning
+	 */
+	private void prepend(Object value) {
+		ListNode element = new ListNode(null, first, value);
+		if (isEmpty())
+			last = element;
+		else
+			first.previous = element;
+		first = element;
+		size++;
+	}
+
+	private void insertInTheMiddle(Object value, int position) {
+		var node = getNode(position);
+		var inserted = new ListNode(node.previous, node, value);
+		node.previous.next = inserted;
+		node.previous = inserted;
+		size++;
+	}
+
+	private ListNode getNode(int index) {
+		ListNode node;
+		if (index <= size / 2) {
+			node = first;
+			for (int i = 0; i < index; i++)
+				node = node.next;
+		} else {
+			node = last;
+			for (int i = size; i > index; i--)
+				node = node.previous;
+		}
+		return node;
+	}
+
+	private void removeNode(ListNode node) {
+		if (size == 1)
+			clear();
+		else {
+			if (node == first) {
+				node.next.previous = null;
+				first = node.next;
+			} else if (node == last) {
+				node.previous.next = null;
+				last = node.previous;
+			} else {
+				node.previous.next = node.next;
+				node.next.previous = node.previous;
+			}
+			size--;
 		}
 	}
 }
