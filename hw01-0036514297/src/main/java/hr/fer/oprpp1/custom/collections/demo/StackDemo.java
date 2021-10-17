@@ -59,7 +59,7 @@ public class StackDemo {
 		case "%":
 			return op1 % op2;
 		default:
-			return 0;
+			throw new InvalidExpressionException();
 		}
 	}
 
