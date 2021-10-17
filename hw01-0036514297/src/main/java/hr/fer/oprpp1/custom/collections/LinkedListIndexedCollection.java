@@ -4,11 +4,15 @@ import static java.util.Objects.checkIndex;
 import static java.util.Objects.requireNonNull;
 
 public class LinkedListIndexedCollection extends Collection {
+
+	/**
+	 * Element of linked list
+	 */
 	private static class ListNode {
 		private ListNode previous;
 		private ListNode next;
 		private Object value;
-
+		
 		public ListNode(ListNode prev, ListNode next, Object value) {
 			this.previous = prev;
 			this.next = next;
