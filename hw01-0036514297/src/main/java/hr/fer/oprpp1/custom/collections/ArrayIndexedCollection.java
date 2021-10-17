@@ -6,17 +6,41 @@ import static java.util.Objects.checkIndex;
 import static java.util.Objects.requireNonNull;
 
 public class ArrayIndexedCollection extends Collection {
+
+	/**
+	 * Current size of collection
+	 */
 	private int size;
+
+	/**
+	 * An array of object references which length determines its current capacity
+	 */
 	private Object[] elements;
 
+	/**
+	 * Constant indicating no presence of value
+	 */
 	private static final int VALUE_IS_NOT_FOUND = -1;
+	/**
+	 * Default size of internal array 
+	 */
 	private static final int DEFAULT_CAPACITY = 16;
+	/**
+	 * Minimal size of internal array
+	 */
 	private static final int MIN_SIZE = 1;
 
+	/**
+	 * Default constructor setting capacity to default size
+	 */
 	public ArrayIndexedCollection() {
 		this(DEFAULT_CAPACITY);
 	}
 
+	/**
+	 * Constructor with arbitrary size
+	 * @param initialCapacity of the array
+	 */
 	public ArrayIndexedCollection(int initialCapacity) {
 		if (initialCapacity < MIN_SIZE)
 			throw new IllegalArgumentException();
@@ -29,7 +53,7 @@ public class ArrayIndexedCollection extends Collection {
 
 	public ArrayIndexedCollection(Collection other, int initialCapacity) {
 		requireNonNull(other);
-		size=other.size();
+		size = other.size();
 		elements = Arrays.copyOf(other.toArray(), Math.max(initialCapacity, size));
 	}
 

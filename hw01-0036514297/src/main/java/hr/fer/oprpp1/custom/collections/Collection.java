@@ -2,41 +2,56 @@ package hr.fer.oprpp1.custom.collections;
 
 public class Collection {
 
+	/**
+	 * Size constant which represents empty <code>Collection</code>
+	 */
+	public static final int EMPTY = 0;
+
 	protected Collection() {
 	}
 
 	/**
-	 * @return <code>true</code> if collection contains no objects and
-	 *         <code>false</code> otherwise
+	 * Returns <code>true</code> if collection contains no objects and
+	 * <code>false</code> otherwise
+	 * 
+	 * @return boolean state
 	 */
 	public boolean isEmpty() {
-		return size() == 0;
+		return size() == EMPTY;
 	}
 
 	/**
-	 * @return The number of currently stored objects in this collections
+	 * The number of currently stored objects in this collections
+	 * 
+	 * @return number of stored objects
 	 */
 	public int size() {
-		return 0;
+		return EMPTY;
 	}
 
 	/**
 	 * Adds the given object into this collection
+	 * 
+	 * @param <code>Object</code> to be added
 	 */
 	public void add(Object value) {
 	}
 
 	/**
-	 * @return <code>true</code> only if the collection contains given value, as
-	 *         determined by equals method
+	 * Returns <code>true</code> only if the collection contains given value, as
+	 * determined by <code>equals</code> method
+	 * 
+	 * @param value <code>Object</code> to be searched
 	 */
 	public boolean contains(Object value) {
 		return false;
 	}
 
 	/**
-	 * Returns true only if the collection contains given value as determined by
-	 * equals method and removes one occurence of it
+	 * Returns <code>true</code> only if the collection contains given value as determined by
+	 * <code>equals</code> method and removes one occurence of it
+	 * 
+	 * @param value <code>Object</code> to remove 
 	 */
 	public boolean remove(Object value) {
 		return false;
@@ -45,7 +60,7 @@ public class Collection {
 	/**
 	 * Allocates new array with size equals to the size of this collections, fills
 	 * it with collection content and returns the array. This method never returns
-	 * null
+	 * <code>null</code>
 	 * 
 	 * @return New array of elements
 	 */
@@ -57,6 +72,8 @@ public class Collection {
 	 * Method calls <code>processor.process()</code> for each element of this
 	 * collection. The order in which elements will be sent is undefined in the
 	 * class
+	 * 
+	 * @param processor <code>Processor</code> to be used
 	 */
 	public void forEach(Processor processor) {
 	}
@@ -64,6 +81,8 @@ public class Collection {
 	/**
 	 * Method adds into the current collection all elements from the given
 	 * collection. This other collection remains unchanged
+	 * 
+	 * @param other <code>Collection</code> of elements to be added
 	 */
 	public void addAll(Collection other) {
 		class Adder extends Processor {
