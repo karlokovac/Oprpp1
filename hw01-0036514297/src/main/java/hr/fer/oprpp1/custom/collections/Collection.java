@@ -49,8 +49,8 @@ public class Collection {
 	}
 
 	/**
-	 * Returns <code>true</code> only if the collection contains given value as determined by
-	 * <code>equals</code> method and removes one occurrence of it
+	 * Returns <code>true</code> only if the collection contains given value as
+	 * determined by <code>equals</code> method and removes one occurrence of it
 	 * 
 	 * @param value <code>Object</code> to remove
 	 * @return boolean indicating removal of an <code>Object</code>

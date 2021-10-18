@@ -74,8 +74,9 @@ public class ObjectStack {
 	}
 
 	/**
-	 * Returns the last index of the internal storage
-	 * @return
+	 * Returns the last element index of the internal storage
+	 * 
+	 * @return last element index
 	 */
 	private int lastInternal() {
 		return internal.size() - 1;

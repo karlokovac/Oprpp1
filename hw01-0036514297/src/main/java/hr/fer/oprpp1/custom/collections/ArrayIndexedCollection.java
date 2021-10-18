@@ -87,7 +87,7 @@ public class ArrayIndexedCollection extends Collection {
 	 * 
 	 * @param index of the position
 	 * @return <code>Object</code> to be returned
-	 * @throws IndexOutOfBoundsException if <code>index</code> is missused
+	 * @throws IndexOutOfBoundsException if <code>index</code> is misused
 	 */
 	public Object get(int index) {
 		checkIndex(index, size);
@@ -105,9 +105,9 @@ public class ArrayIndexedCollection extends Collection {
 	 * The legal positions are 0 to <code>size</code> (both are included)
 	 * 
 	 * @param value    to be inserted
-	 * @param position to be placed
+	 * @param position to be placed at
 	 * @throws NullPointerException if <code>value</code> is <code>null</code>
-	 * @throws IndexOutOfBoundsException if position is missused
+	 * @throws IndexOutOfBoundsException if position is misused
 	 */
 	public void insert(Object value, int position) {
 		checkIndex(position, size + 1);

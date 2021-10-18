@@ -12,7 +12,7 @@ public class LinkedListIndexedCollection extends Collection {
 		private ListNode previous;
 		private ListNode next;
 		private Object value;
-		
+
 		public ListNode(ListNode prev, ListNode next, Object value) {
 			this.previous = prev;
 			this.next = next;
