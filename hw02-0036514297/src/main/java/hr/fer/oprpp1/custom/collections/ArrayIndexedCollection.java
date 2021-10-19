@@ -1,6 +1,7 @@
 package hr.fer.oprpp1.custom.collections;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 import static java.util.Objects.checkIndex;
 import static java.util.Objects.requireNonNull;
@@ -106,7 +107,7 @@ public class ArrayIndexedCollection implements Collection {
 	 * 
 	 * @param value    to be inserted
 	 * @param position to be placed at
-	 * @throws NullPointerException if <code>value</code> is <code>null</code>
+	 * @throws NullPointerException      if <code>value</code> is <code>null</code>
 	 * @throws IndexOutOfBoundsException if position is misused
 	 */
 	public void insert(Object value, int position) {
@@ -179,6 +180,12 @@ public class ArrayIndexedCollection implements Collection {
 			processor.process(elements[i]);
 	}
 
+
+	@Override
+	public ElementGetter createElementGetter() {
+		return new Getter(elements,size);
+	}
+	
 	/**
 	 * Duplicates backing array if it's full
 	 */
@@ -207,6 +214,31 @@ public class ArrayIndexedCollection implements Collection {
 		for (int i = position; i < size; i++) {
 			elements[i] = elements[i + 1];
 		}
+	}
+
+	private static class Getter implements ElementGetter {
+		private int index;
+		private int size;
+		private Object[] array;
+
+		public Getter(Object[] array, int size) {
+			this.array = array;
+			this.size = size;
+		}
+
+		@Override
+		public boolean hasNextElement() {
+			return index < size;
+		}
+
+		@Override
+		public Object getNextElement() {
+			if (!hasNextElement())
+				throw new NoSuchElementException("No element to get");
+			index++;
+			return array[index++];
+		}
+
 	}
 
 }

@@ -3,22 +3,9 @@ package hr.fer.oprpp1.custom.collections;
 import static java.util.Objects.checkIndex;
 import static java.util.Objects.requireNonNull;
 
+import java.util.NoSuchElementException;
+
 public class LinkedListIndexedCollection implements Collection {
-
-	/**
-	 * Element of linked list
-	 */
-	private static class ListNode {
-		private ListNode previous;
-		private ListNode next;
-		private Object value;
-
-		public ListNode(ListNode prev, ListNode next, Object value) {
-			this.previous = prev;
-			this.next = next;
-			this.value = value;
-		}
-	}
 
 	/**
 	 * Constant indicating value isn't found
@@ -55,8 +42,7 @@ public class LinkedListIndexedCollection implements Collection {
 	 */
 	public LinkedListIndexedCollection(Collection other) {
 		this();
-		requireNonNull(other);
-		addAll(other);
+		addAll(requireNonNull(other));
 	}
 
 	/**
@@ -64,8 +50,7 @@ public class LinkedListIndexedCollection implements Collection {
 	 */
 	@Override
 	public void add(Object value) {
-		requireNonNull(value);
-		append(value);
+		append(requireNonNull(value));
 	}
 
 	/**
@@ -77,8 +62,7 @@ public class LinkedListIndexedCollection implements Collection {
 	 * @throws IndexOutOfBoundsException if index is missused
 	 */
 	public Object get(int index) {
-		checkIndex(index, size);
-		return getNode(index).value;
+		return getNode(checkIndex(index, size)).value;
 	}
 
 	@Override
@@ -136,8 +120,7 @@ public class LinkedListIndexedCollection implements Collection {
 	 * @throws IndexOutOfBoundsException if index is missused
 	 */
 	public void remove(int index) {
-		checkIndex(index, size);
-		removeNode(getNode(index));
+		removeNode(getNode(checkIndex(index, size)));
 	}
 
 	@Override
@@ -174,6 +157,11 @@ public class LinkedListIndexedCollection implements Collection {
 		for (var node = first; node != null; node = node.next) {
 			processor.process(node.value);
 		}
+	}
+
+	@Override
+	public ElementGetter createElementGetter() {
+		return new Getter(first);
 	}
 
 	/**
@@ -263,4 +251,44 @@ public class LinkedListIndexedCollection implements Collection {
 			size--;
 		}
 	}
+
+	/**
+	 * Element of linked list
+	 */
+	private static class ListNode {
+		private ListNode previous;
+		private ListNode next;
+		private Object value;
+
+		public ListNode(ListNode prev, ListNode next, Object value) {
+			this.previous = prev;
+			this.next = next;
+			this.value = value;
+		}
+	}
+
+	private static class Getter implements ElementGetter {
+
+		private ListNode node;
+
+		public Getter(ListNode node) {
+			this.node = node;
+		}
+
+		@Override
+		public boolean hasNextElement() {
+			return node != null;
+		}
+
+		@Override
+		public Object getNextElement() {
+			if (!hasNextElement())
+				throw new NoSuchElementException();
+			var next = node;
+			node = node.next;
+			return next;
+		}
+
+	}
+
 }

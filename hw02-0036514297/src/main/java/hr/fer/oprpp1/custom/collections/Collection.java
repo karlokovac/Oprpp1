@@ -5,7 +5,7 @@ public interface Collection {
 	/**
 	 * Size constant which represents empty <code>Collection</code>
 	 */
-	public static final int EMPTY = 0;
+	int EMPTY = 0;
 
 	/**
 	 * Returns <code>true</code> if collection contains no objects and
@@ -47,7 +47,7 @@ public interface Collection {
 	 * @param value <code>Object</code> to remove
 	 * @return boolean indicating removal of an <code>Object</code>
 	 */
-	public boolean remove(Object value);
+	boolean remove(Object value);
 
 	/**
 	 * Allocates new array with size equals to the size of this collections, fills
@@ -81,4 +81,6 @@ public interface Collection {
 	 * Removes all elements from this collection
 	 */
 	void clear();
+	
+	ElementGetter createElementGetter();
 }
