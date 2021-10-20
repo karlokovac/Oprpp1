@@ -3,6 +3,7 @@ package hr.fer.oprpp1.custom.collections;
 import static java.util.Objects.checkIndex;
 import static java.util.Objects.requireNonNull;
 
+import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
 public class LinkedListIndexedCollection implements Collection {
@@ -24,6 +25,8 @@ public class LinkedListIndexedCollection implements Collection {
 	 * Reference to the last node of the linked list
 	 */
 	private ListNode last;
+
+	private long modificationCount;
 
 	/**
 	 * Default constructor
@@ -70,6 +73,7 @@ public class LinkedListIndexedCollection implements Collection {
 		first = null;
 		last = null;
 		size = 0;
+		modificationCount++;
 	}
 
 	/**
@@ -160,8 +164,8 @@ public class LinkedListIndexedCollection implements Collection {
 	}
 
 	@Override
-	public ElementGetter createElementGetter() {
-		return new Getter(first);
+	public ElementsGetter createElementsGetter() {
+		return new Getter(this);
 	}
 
 	/**
@@ -177,6 +181,7 @@ public class LinkedListIndexedCollection implements Collection {
 			last.next = element;
 		last = element;
 		size++;
+		modificationCount++;
 	}
 
 	/**
@@ -192,6 +197,7 @@ public class LinkedListIndexedCollection implements Collection {
 			first.previous = element;
 		first = element;
 		size++;
+		modificationCount++;
 	}
 
 	/**
@@ -207,6 +213,7 @@ public class LinkedListIndexedCollection implements Collection {
 		node.previous.next = inserted;
 		node.previous = inserted;
 		size++;
+		modificationCount++;
 	}
 
 	/**
@@ -250,6 +257,7 @@ public class LinkedListIndexedCollection implements Collection {
 			}
 			size--;
 		}
+		modificationCount++;
 	}
 
 	/**
@@ -267,12 +275,17 @@ public class LinkedListIndexedCollection implements Collection {
 		}
 	}
 
-	private static class Getter implements ElementGetter {
+	private static class Getter implements ElementsGetter {
 
 		private ListNode node;
+		private long savedModificationCount;
+		LinkedListIndexedCollection collection;
 
-		public Getter(ListNode node) {
-			this.node = node;
+		public Getter(LinkedListIndexedCollection collection) {
+			this.collection = collection;
+			this.node = collection.first;
+			this.savedModificationCount = collection.modificationCount;
+
 		}
 
 		@Override
@@ -282,13 +295,22 @@ public class LinkedListIndexedCollection implements Collection {
 
 		@Override
 		public Object getNextElement() {
-			if (!hasNextElement())
-				throw new NoSuchElementException();
+			checkConcurrentModification();
+			checkNextElement();
 			var next = node;
 			node = node.next;
-			return next;
+			return next.value;
 		}
 
+		private void checkNextElement() {
+			if (!hasNextElement())
+				throw new NoSuchElementException();
+		}
+
+		private void checkConcurrentModification() {
+			if (savedModificationCount != collection.modificationCount)
+				throw new ConcurrentModificationException();
+		}
 	}
 
 }

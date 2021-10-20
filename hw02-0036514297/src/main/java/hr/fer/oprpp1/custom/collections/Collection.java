@@ -81,6 +81,6 @@ public interface Collection {
 	 * Removes all elements from this collection
 	 */
 	void clear();
-	
-	ElementGetter createElementGetter();
+
+	ElementsGetter createElementsGetter();
 }

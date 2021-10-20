@@ -1,22 +1,13 @@
 package hr.fer.oprpp1.custom.collections;
 
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
 import static java.util.Objects.checkIndex;
 import static java.util.Objects.requireNonNull;
 
 public class ArrayIndexedCollection implements Collection {
-
-	/**
-	 * Current size of collection
-	 */
-	private int size;
-
-	/**
-	 * An array of object references which length determines its current capacity
-	 */
-	private Object[] elements;
 
 	/**
 	 * Constant indicating no presence of value
@@ -30,6 +21,18 @@ public class ArrayIndexedCollection implements Collection {
 	 * Minimal size of internal array
 	 */
 	private static final int MIN_SIZE = 1;
+
+	/**
+	 * Current size of collection
+	 */
+	private int size;
+
+	/**
+	 * An array of object references which length determines its current capacity
+	 */
+	private Object[] elements;
+
+	private long modificationCount;
 
 	/**
 	 * Default constructor setting capacity to default size
@@ -99,6 +102,7 @@ public class ArrayIndexedCollection implements Collection {
 	public void clear() {
 		Arrays.fill(elements, null);
 		size = 0;
+		modificationCount++;
 	}
 
 	/**
@@ -180,18 +184,19 @@ public class ArrayIndexedCollection implements Collection {
 			processor.process(elements[i]);
 	}
 
-
 	@Override
-	public ElementGetter createElementGetter() {
-		return new Getter(elements,size);
+	public ElementsGetter createElementsGetter() {
+		return new Getter(this);
 	}
-	
+
 	/**
 	 * Duplicates backing array if it's full
 	 */
 	private void reallocateIfFull() {
-		if (size == elements.length)
+		if (size == elements.length) {
 			elements = Arrays.copyOf(elements, elements.length * 2);
+			modificationCount++;
+		}
 	}
 
 	/**
@@ -203,6 +208,7 @@ public class ArrayIndexedCollection implements Collection {
 		for (int i = size; i > position; i--) {
 			elements[i] = elements[i - 1];
 		}
+		modificationCount++;
 	}
 
 	/**
@@ -214,31 +220,40 @@ public class ArrayIndexedCollection implements Collection {
 		for (int i = position; i < size; i++) {
 			elements[i] = elements[i + 1];
 		}
+		modificationCount++;
 	}
 
-	private static class Getter implements ElementGetter {
+	private static class Getter implements ElementsGetter {
 		private int index;
-		private int size;
-		private Object[] array;
+		private long savedModificationCount;
+		private ArrayIndexedCollection collection;
 
-		public Getter(Object[] array, int size) {
-			this.array = array;
-			this.size = size;
+		public Getter(ArrayIndexedCollection collection) {
+			this.collection = collection;
+			this.savedModificationCount = collection.modificationCount;
 		}
 
 		@Override
 		public boolean hasNextElement() {
-			return index < size;
+			return index < collection.size;
 		}
 
 		@Override
 		public Object getNextElement() {
-			if (!hasNextElement())
-				throw new NoSuchElementException("No element to get");
-			index++;
-			return array[index++];
+			checkConcurrentModification();
+			checkNextElement();
+			return collection.elements[index++];
 		}
 
+		private void checkNextElement() {
+			if (!hasNextElement())
+				throw new NoSuchElementException("No element to get");
+		}
+
+		private void checkConcurrentModification() {
+			if (savedModificationCount != collection.modificationCount)
+				throw new ConcurrentModificationException();
+		}
 	}
 
 }
