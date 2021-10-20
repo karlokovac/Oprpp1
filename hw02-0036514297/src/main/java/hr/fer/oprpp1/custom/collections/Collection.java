@@ -65,7 +65,11 @@ public interface Collection {
 	 * 
 	 * @param processor <code>Processor</code> to be used
 	 */
-	void forEach(Processor processor);
+	default void forEach(Processor processor) {
+		ElementsGetter getter = createElementsGetter();
+		while (getter.hasNextElement())
+			processor.process(getter.getNextElement());
+	}
 
 	/**
 	 * Method adds into the current collection all elements from the given
@@ -83,4 +87,11 @@ public interface Collection {
 	void clear();
 
 	ElementsGetter createElementsGetter();
+
+	default void addAllSatisfying(Collection col, Tester tester) {
+		col.forEach((value) -> {
+			if (tester.test(value))
+				add(value);
+		});
+	}
 }

@@ -6,7 +6,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
-public class LinkedListIndexedCollection implements Collection {
+public class LinkedListIndexedCollection implements List {
 
 	/**
 	 * Constant indicating value isn't found

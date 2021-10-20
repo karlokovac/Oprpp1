@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 import static java.util.Objects.checkIndex;
 import static java.util.Objects.requireNonNull;
 
-public class ArrayIndexedCollection implements Collection {
+public class ArrayIndexedCollection implements List {
 
 	/**
 	 * Constant indicating no presence of value
