@@ -225,8 +225,8 @@ public class ArrayIndexedCollection implements List {
 
 	private static class Getter implements ElementsGetter {
 		private int index;
-		private long savedModificationCount;
-		private ArrayIndexedCollection collection;
+		private final long savedModificationCount;
+		private final ArrayIndexedCollection collection;
 
 		public Getter(ArrayIndexedCollection collection) {
 			this.collection = collection;

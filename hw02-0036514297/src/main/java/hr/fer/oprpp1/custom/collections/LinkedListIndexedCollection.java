@@ -278,8 +278,8 @@ public class LinkedListIndexedCollection implements List {
 	private static class Getter implements ElementsGetter {
 
 		private ListNode node;
-		private long savedModificationCount;
-		LinkedListIndexedCollection collection;
+		private final long savedModificationCount;
+		private final LinkedListIndexedCollection collection;
 
 		public Getter(LinkedListIndexedCollection collection) {
 			this.collection = collection;
