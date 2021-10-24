@@ -8,16 +8,6 @@ import static java.util.Objects.requireNonNull;
 public class ArrayIndexedCollection extends Collection {
 
 	/**
-	 * Current size of collection
-	 */
-	private int size;
-
-	/**
-	 * An array of object references which length determines its current capacity
-	 */
-	private Object[] elements;
-
-	/**
 	 * Constant indicating no presence of value
 	 */
 	private static final int VALUE_IS_NOT_FOUND = -1;
@@ -29,6 +19,16 @@ public class ArrayIndexedCollection extends Collection {
 	 * Minimal size of internal array
 	 */
 	private static final int MIN_SIZE = 1;
+	
+	/**
+	 * Current size of collection
+	 */
+	private int size;
+
+	/**
+	 * An array of object references which length determines its current capacity
+	 */
+	private Object[] elements;
 
 	/**
 	 * Default constructor setting capacity to default size
