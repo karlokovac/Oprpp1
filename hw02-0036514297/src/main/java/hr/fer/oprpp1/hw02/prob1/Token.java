@@ -1,8 +1,8 @@
 package hr.fer.oprpp1.hw02.prob1;
 
 public class Token {
-	private TokenType type;
-	private Object value;
+	private final TokenType type;
+	private final Object value;
 
 	public Token(TokenType type, Object value) {
 		if (type == null)

@@ -20,8 +20,6 @@ public class Lexer {
 	// baca LexerException ako dođe do pogreške
 	public Token nextToken() {
 		searchNextToken();
-		if (isPoundToken(token))
-			switchState();
 		return token;
 	}
 
@@ -36,13 +34,6 @@ public class Lexer {
 		this.state = state;
 	}
 
-	private void switchState() {
-		switch (state) {
-		case BASIC -> this.state = LexerState.EXTENDED;
-		case EXTENDED -> this.state = LexerState.BASIC;
-		}
-	}
-
 	private void searchNextToken() {
 		throwIfAlreadyEOF();
 		skipBlanks();
@@ -50,7 +41,7 @@ public class Lexer {
 			token = new Token(TokenType.EOF, null);
 			return;
 		}
-		searchWithContext();
+		extractWithContext();
 	}
 
 	private void throwIfAlreadyEOF() {
@@ -63,29 +54,28 @@ public class Lexer {
 			currentIndex++;
 	}
 
-	private void searchWithContext() {
+	private void extractWithContext() {
 		switch (state) {
-		case BASIC -> searchBasic();
-		case EXTENDED -> searchExtended();
+		case BASIC -> extractBasic();
+		case EXTENDED -> extractExtended();
 		}
 	}
 
-	private void searchBasic() {
+	private void extractBasic() {
 		if (isCandidateForWord(currentChar())) {
-			searchWordWithEscapes();
+			extractWordWithEscapes();
 			return;
 		}
 		if (Character.isDigit(currentChar())) {
-			searchNumber();
+			extractNumber();
 			return;
 		}
-		searchSymbol();
+		extractSymbol();
 	}
 
-	private void searchExtended() {
+	private void extractExtended() {
 		if (currentChar() == '#') {
-			token = new Token(TokenType.SYMBOL, Character.valueOf(currentChar()));
-			currentIndex++;
+			extractSymbol();
 			return;
 		}
 		int start = currentIndex;
@@ -95,7 +85,7 @@ public class Lexer {
 		token = new Token(TokenType.WORD, String.valueOf(data, start, currentIndex - start));
 	}
 
-	private void searchWordWithEscapes() {
+	private void extractWordWithEscapes() {
 		final StringBuilder builder = new StringBuilder();
 		do {
 			if (isEscape(currentChar())) {
@@ -109,7 +99,7 @@ public class Lexer {
 		token = new Token(TokenType.WORD, builder.toString());
 	}
 
-	private void searchNumber() {
+	private void extractNumber() {
 		final int start = currentIndex;
 		do {
 			currentIndex++;
@@ -123,7 +113,7 @@ public class Lexer {
 		token = new Token(TokenType.NUMBER, result);
 	}
 
-	private void searchSymbol() {
+	private void extractSymbol() {
 		token = new Token(TokenType.SYMBOL, Character.valueOf(currentChar()));
 		currentIndex++;
 	}
