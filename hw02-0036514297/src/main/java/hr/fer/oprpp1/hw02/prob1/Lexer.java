@@ -1,43 +1,28 @@
 package hr.fer.oprpp1.hw02.prob1;
 
-import java.util.Arrays;
-
+import static hr.fer.oprpp1.hw02.prob1.LexerUtil.*;
 import static java.util.Objects.requireNonNull;
 
 public class Lexer {
 	private final char[] data; // ulazni tekst
 	private Token token; // trenutni token
 	private int currentIndex; // indeks prvog neobrađenog znaka
-	private State state;
-
-	private static final char[] BLANKS;
-
-	private final State basicState = () -> {
-		if (isCandidateForWord(currentChar()))
-			return searchWordWithEscapes();
-		if (Character.isDigit(currentChar()))
-			return searchNumber();
-		return searchSymbol();
-	};
-
-	static {
-		char[] blanks = { '\r', '\n', '\t', ' ' };
-		Arrays.sort(blanks);
-		BLANKS = blanks;
-	}
+	private LexerState state;
 
 	// konstruktor prima ulazni tekst koji se tokenizira
 	public Lexer(String text) {
 		requireNonNull(text);
 		data = text.toCharArray();
-		state = basicState;
+		state = LexerState.BASIC;
 	}
 
 	// generira i vraća sljedeći token
 	// baca LexerException ako dođe do pogreške
 	public Token nextToken() {
-		token = searchNextToken();
-		return getToken();
+		searchNextToken();
+		if (isPoundToken(token))
+			switchState();
+		return token;
 	}
 
 	// vraća zadnji generirani token; može se pozivati
@@ -48,18 +33,24 @@ public class Lexer {
 
 	public void setState(LexerState state) {
 		requireNonNull(state);
+		this.state = state;
+	}
+
+	private void switchState() {
 		switch (state) {
-		case BASIC -> this.state = basicState;
-		case EXTENDED -> this.state = null;
+		case BASIC -> this.state = LexerState.EXTENDED;
+		case EXTENDED -> this.state = LexerState.BASIC;
 		}
 	}
 
-	private Token searchNextToken() {
+	private void searchNextToken() {
 		throwIfAlreadyEOF();
 		skipBlanks();
-		if (currentIndex >= data.length)
-			return new Token(TokenType.EOF, null);
-		return state.getNextToken();
+		if (currentIndex >= data.length) {
+			token = new Token(TokenType.EOF, null);
+			return;
+		}
+		searchWithContext();
 	}
 
 	private void throwIfAlreadyEOF() {
@@ -72,7 +63,39 @@ public class Lexer {
 			currentIndex++;
 	}
 
-	private Token searchWordWithEscapes() {
+	private void searchWithContext() {
+		switch (state) {
+		case BASIC -> searchBasic();
+		case EXTENDED -> searchExtended();
+		}
+	}
+
+	private void searchBasic() {
+		if (isCandidateForWord(currentChar())) {
+			searchWordWithEscapes();
+			return;
+		}
+		if (Character.isDigit(currentChar())) {
+			searchNumber();
+			return;
+		}
+		searchSymbol();
+	}
+
+	private void searchExtended() {
+		if (currentChar() == '#') {
+			token = new Token(TokenType.SYMBOL, Character.valueOf(currentChar()));
+			currentIndex++;
+			return;
+		}
+		int start = currentIndex;
+		do {
+			currentIndex++;
+		} while (currentIndex < data.length && !isBlank(currentChar()) && currentChar() != '#');
+		token = new Token(TokenType.WORD, String.valueOf(data, start, currentIndex - start));
+	}
+
+	private void searchWordWithEscapes() {
 		final StringBuilder builder = new StringBuilder();
 		do {
 			if (isEscape(currentChar())) {
@@ -83,10 +106,10 @@ public class Lexer {
 			builder.append(currentChar());
 			currentIndex++;
 		} while (currentIndex < data.length && isCandidateForWord(currentChar()));
-		return new Token(TokenType.WORD, builder.toString());
+		token = new Token(TokenType.WORD, builder.toString());
 	}
 
-	private Token searchNumber() {
+	private void searchNumber() {
 		final int start = currentIndex;
 		do {
 			currentIndex++;
@@ -97,38 +120,16 @@ public class Lexer {
 		} catch (NumberFormatException exc) {
 			throw new LexerException(exc);
 		}
-		return new Token(TokenType.NUMBER, result);
+		token = new Token(TokenType.NUMBER, result);
 	}
 
-	private Token searchSymbol() {
-		final var token = new Token(TokenType.SYMBOL, Character.valueOf(currentChar()));
+	private void searchSymbol() {
+		token = new Token(TokenType.SYMBOL, Character.valueOf(currentChar()));
 		currentIndex++;
-		return token;
 	}
 
 	private char currentChar() {
 		return data[currentIndex];
-	}
-
-	private static boolean isBlank(char character) {
-		return Arrays.binarySearch(BLANKS, character) >= 0;
-	}
-
-	private static boolean isEscape(char character) {
-		return Character.compare('\\', character) == 0;
-	}
-
-	private static boolean isValidEscapeCharacter(char character) {
-		return Character.isDigit(character) || isEscape(character);
-	}
-
-	private static boolean isCandidateForWord(char character) {
-		return Character.isLetter(character) || isEscape(character);
-	}
-	
-	@FunctionalInterface
-	private interface State {
-		Token getNextToken();
 	}
 
 }

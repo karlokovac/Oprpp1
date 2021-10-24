@@ -2,7 +2,6 @@ package hr.fer.oprpp1.hw02.prob1;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class Prob1Test {
@@ -10,7 +9,7 @@ public class Prob1Test {
 	@Test
 	public void testNotNull() {
 		Lexer lexer = new Lexer("");
-		
+
 		assertNotNull(lexer.nextToken(), "Token was expected but null was returned.");
 	}
 
@@ -23,15 +22,16 @@ public class Prob1Test {
 	@Test
 	public void testEmpty() {
 		Lexer lexer = new Lexer("");
-		
+
 		assertEquals(TokenType.EOF, lexer.nextToken().getType(), "Empty input must generate only EOF token.");
 	}
 
 	@Test
 	public void testGetReturnsLastNext() {
-		// Calling getToken once or several times after calling nextToken must return each time what nextToken returned...
+		// Calling getToken once or several times after calling nextToken must return
+		// each time what nextToken returned...
 		Lexer lexer = new Lexer("");
-		
+
 		Token token = lexer.nextToken();
 		assertEquals(token, lexer.getToken(), "getToken returned different token than nextToken.");
 		assertEquals(token, lexer.getToken(), "getToken returned different token than nextToken.");
@@ -46,13 +46,14 @@ public class Prob1Test {
 		// will throw!
 		assertThrows(LexerException.class, () -> lexer.nextToken());
 	}
-	
+
 	@Test
 	public void testNoActualContent() {
 		// When input is only of spaces, tabs, newlines, etc...
 		Lexer lexer = new Lexer("   \r\n\t    ");
-		
-		assertEquals(TokenType.EOF, lexer.nextToken().getType(), "Input had no content. Lexer should generated only EOF token.");
+
+		assertEquals(TokenType.EOF, lexer.nextToken().getType(),
+				"Input had no content. Lexer should generated only EOF token.");
 	}
 
 	@Test
@@ -61,11 +62,8 @@ public class Prob1Test {
 		Lexer lexer = new Lexer("  Štefanija\r\n\t Automobil   ");
 
 		// We expect the following stream of tokens
-		Token correctData[] = {
-			new Token(TokenType.WORD, "Štefanija"),
-			new Token(TokenType.WORD, "Automobil"),
-			new Token(TokenType.EOF, null)
-		};
+		Token correctData[] = { new Token(TokenType.WORD, "Štefanija"), new Token(TokenType.WORD, "Automobil"),
+				new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
 	}
@@ -75,17 +73,14 @@ public class Prob1Test {
 		Lexer lexer = new Lexer("  \\1st  \r\n\t   ");
 
 		// We expect the following stream of tokens
-		Token correctData[] = {
-			new Token(TokenType.WORD, "1st"),
-			new Token(TokenType.EOF, null)
-		};
+		Token correctData[] = { new Token(TokenType.WORD, "1st"), new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
 	}
 
 	@Test
 	public void testInvalidEscapeEnding() {
-		Lexer lexer = new Lexer("   \\");  // this is three spaces and a single backslash -- 4 letters string
+		Lexer lexer = new Lexer("   \\"); // this is three spaces and a single backslash -- 4 letters string
 
 		// will throw!
 		assertThrows(LexerException.class, () -> lexer.nextToken());
@@ -104,10 +99,7 @@ public class Prob1Test {
 		Lexer lexer = new Lexer("  \\1  ");
 
 		// We expect the following stream of tokens
-		Token correctData[] = {
-			new Token(TokenType.WORD, "1"),
-			new Token(TokenType.EOF, null)
-		};
+		Token correctData[] = { new Token(TokenType.WORD, "1"), new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
 	}
@@ -118,11 +110,15 @@ public class Prob1Test {
 		Lexer lexer = new Lexer("  ab\\1\\2cd\\3 ab\\2\\1cd\\4\\\\ \r\n\t   ");
 
 		// We expect the following stream of tokens
-		Token correctData[] = {
-			new Token(TokenType.WORD, "ab12cd3"),
-			new Token(TokenType.WORD, "ab21cd4\\"), // this is 8-letter long, not nine! Only single backslash!
-			new Token(TokenType.EOF, null)
-		};
+		Token correctData[] = { new Token(TokenType.WORD, "ab12cd3"), new Token(TokenType.WORD, "ab21cd4\\"), // this is
+																												// 8-letter
+																												// long,
+																												// not
+																												// nine!
+																												// Only
+																												// single
+																												// backslash!
+				new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
 	}
@@ -132,11 +128,8 @@ public class Prob1Test {
 		// Lets check for several numbers...
 		Lexer lexer = new Lexer("  1234\r\n\t 5678   ");
 
-		Token correctData[] = {
-			new Token(TokenType.NUMBER, Long.valueOf(1234)),
-			new Token(TokenType.NUMBER, Long.valueOf(5678)),
-			new Token(TokenType.EOF, null)
-		};
+		Token correctData[] = { new Token(TokenType.NUMBER, Long.valueOf(1234)),
+				new Token(TokenType.NUMBER, Long.valueOf(5678)), new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
 	}
@@ -155,34 +148,29 @@ public class Prob1Test {
 		Lexer lexer = new Lexer("  ab\\123cd ab\\2\\1cd\\4\\\\ \r\n\t   ");
 
 		// We expect following stream of tokens
-		Token correctData[] = {
-			new Token(TokenType.WORD, "ab1"),
-			new Token(TokenType.NUMBER, Long.valueOf(23)),
-			new Token(TokenType.WORD, "cd"),
-			new Token(TokenType.WORD, "ab21cd4\\"), // this is 8-letter long, not nine! Only single backslash!
-			new Token(TokenType.EOF, null)
-		};
+		Token correctData[] = { new Token(TokenType.WORD, "ab1"), new Token(TokenType.NUMBER, Long.valueOf(23)),
+				new Token(TokenType.WORD, "cd"), new Token(TokenType.WORD, "ab21cd4\\"), // this is 8-letter long, not
+																							// nine! Only single
+																							// backslash!
+				new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
 	}
-	
+
 	@Test
 	public void testSomeSymbols() {
 		// Lets check for several symbols...
 		Lexer lexer = new Lexer("  -.? \r\n\t ##   ");
 
-		Token correctData[] = {
-			new Token(TokenType.SYMBOL, Character.valueOf('-')),
-			new Token(TokenType.SYMBOL, Character.valueOf('.')),
-			new Token(TokenType.SYMBOL, Character.valueOf('?')),
-			new Token(TokenType.SYMBOL, Character.valueOf('#')),
-			new Token(TokenType.SYMBOL, Character.valueOf('#')),
-			new Token(TokenType.EOF, null)
-		};
+		Token correctData[] = { new Token(TokenType.SYMBOL, Character.valueOf('-')),
+				new Token(TokenType.SYMBOL, Character.valueOf('.')),
+				new Token(TokenType.SYMBOL, Character.valueOf('?')),
+				new Token(TokenType.SYMBOL, Character.valueOf('#')),
+				new Token(TokenType.SYMBOL, Character.valueOf('#')), new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
 	}
-	
+
 	@Test
 	public void testCombinedInput() {
 		// Lets check for several symbols...
@@ -264,7 +252,6 @@ public class Prob1Test {
 				"Input had no content. Lexer should generated only EOF token.");
 	}
 
-	@Disabled
 	@Test
 	public void testMultipartInput() {
 		// Test input which has parts which are tokenized by different rules...
