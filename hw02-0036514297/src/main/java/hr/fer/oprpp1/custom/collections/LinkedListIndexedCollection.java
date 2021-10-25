@@ -56,14 +56,7 @@ public class LinkedListIndexedCollection implements List {
 		append(requireNonNull(value));
 	}
 
-	/**
-	 * Returns the object that is stored in linked list at position index. Valid
-	 * indexes are 0 to <code>size-1</code>
-	 * 
-	 * @param index
-	 * @return <code>Object</code> to be retrieved
-	 * @throws IndexOutOfBoundsException if index is missused
-	 */
+	@Override
 	public Object get(int index) {
 		return getNode(checkIndex(index, size)).value;
 	}
@@ -76,15 +69,7 @@ public class LinkedListIndexedCollection implements List {
 		modificationCount++;
 	}
 
-	/**
-	 * Inserts (does not overwrite) the given value at the given position in array.
-	 * The legal positions are 0 to <code>size</code> (both are included)
-	 * 
-	 * @param value    to be insertred
-	 * @param position to be inserted at
-	 * @throws NullPointerException      if <code>value</code> is <code>null</code>
-	 * @throws IndexOutOfBoundsException if <code>position</code> is missused
-	 */
+	@Override
 	public void insert(Object value, int position) {
 		requireNonNull(value);
 		checkIndex(position, size + 1);
@@ -98,13 +83,7 @@ public class LinkedListIndexedCollection implements List {
 		}
 	}
 
-	/**
-	 * Searches the collection and returns the index of the first occurrence of the
-	 * given value or -1 if the value is not found
-	 * 
-	 * @param value to be found
-	 * @return index of the given value
-	 */
+	@Override
 	public int indexOf(Object value) {
 		if (value != null) {
 			var node = first;
@@ -115,14 +94,7 @@ public class LinkedListIndexedCollection implements List {
 		return VALUE_IS_NOT_FOUND;
 	}
 
-	/**
-	 * Removes element at specified index from collection. Element that was
-	 * previously at location index+1 after this operation is on location index ,
-	 * etc. Legal indexes are 0 to <code>size-1</code>
-	 * 
-	 * @param index at which element is to be removed
-	 * @throws IndexOutOfBoundsException if index is missused
-	 */
+	@Override
 	public void remove(int index) {
 		removeNode(getNode(checkIndex(index, size)));
 	}
@@ -275,6 +247,9 @@ public class LinkedListIndexedCollection implements List {
 		}
 	}
 
+	/**
+	 * Implementation of ElementsGetter for {@link LinkedListIndexedCollection}
+	 */
 	private static class Getter implements ElementsGetter {
 
 		private ListNode node;
@@ -302,11 +277,22 @@ public class LinkedListIndexedCollection implements List {
 			return next.value;
 		}
 
+		/**
+		 * Checks whether there is next element
+		 * 
+		 * @throws NoSuchElementException if there is no next element
+		 */
 		private void checkNextElement() {
 			if (!hasNextElement())
 				throw new NoSuchElementException();
 		}
 
+		/**
+		 * Checks whether <code>Collection</code> was modified during iteration
+		 * 
+		 * @throws ConcurrentModificationException if {@link Collection} was modified
+		 *                                         during iteration
+		 */
 		private void checkConcurrentModification() {
 			if (savedModificationCount != collection.modificationCount)
 				throw new ConcurrentModificationException();

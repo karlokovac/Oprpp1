@@ -86,8 +86,20 @@ public interface Collection {
 	 */
 	void clear();
 
+	/**
+	 * Creates <code>ElementsGetter</code> instance over current collection
+	 * 
+	 * @return <code>ElementsGetter</code> instance
+	 */
 	ElementsGetter createElementsGetter();
 
+	/**
+	 * Adds all elements from the <code>Collection</code> to current collection that
+	 * return <code>true</code> when being tested by <code>Tester</code>
+	 * 
+	 * @param col    <code>Collection</code> to add from
+	 * @param tester <code>Tester</code> to test elements
+	 */
 	default void addAllSatisfying(Collection col, Tester tester) {
 		col.forEach((value) -> {
 			if (tester.test(value))

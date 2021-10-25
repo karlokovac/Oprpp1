@@ -85,14 +85,7 @@ public class ArrayIndexedCollection implements List {
 		elements[size++] = value;
 	}
 
-	/**
-	 * Returns the object that is stored in backing array at position index. Valid
-	 * indexes are 0 to size-1
-	 * 
-	 * @param index of the position
-	 * @return <code>Object</code> to be returned
-	 * @throws IndexOutOfBoundsException if <code>index</code> is misused
-	 */
+	@Override
 	public Object get(int index) {
 		checkIndex(index, size);
 		return elements[index];
@@ -105,15 +98,7 @@ public class ArrayIndexedCollection implements List {
 		modificationCount++;
 	}
 
-	/**
-	 * Inserts (does not overwrite) the given value at the given position in array.
-	 * The legal positions are 0 to <code>size</code> (both are included)
-	 * 
-	 * @param value    to be inserted
-	 * @param position to be placed at
-	 * @throws NullPointerException      if <code>value</code> is <code>null</code>
-	 * @throws IndexOutOfBoundsException if position is misused
-	 */
+	@Override
 	public void insert(Object value, int position) {
 		checkIndex(position, size + 1);
 		requireNonNull(value);
@@ -123,13 +108,7 @@ public class ArrayIndexedCollection implements List {
 		size++;
 	}
 
-	/**
-	 * Searches the collection and returns the index of the first occurrence of the
-	 * given value or -1 if the value is not found
-	 * 
-	 * @param value to be searched for
-	 * @return position of the element
-	 */
+	@Override
 	public int indexOf(Object value) {
 		if (value != null)
 			for (int i = 0; i < elements.length; i++)
@@ -138,14 +117,7 @@ public class ArrayIndexedCollection implements List {
 		return VALUE_IS_NOT_FOUND;
 	}
 
-	/**
-	 * Removes element at specified index from collection. Element that was
-	 * previously at location <code>index+1</code> after this operation is on
-	 * location index , etc. Legal indexes are 0 to <code>size-1</code>
-	 * 
-	 * @param index position of the element
-	 * @throws IndexOutOfBoundsException if <code>index</code> is misused
-	 */
+	@Override
 	public void remove(int index) {
 		checkIndex(index, size);
 		elements[index] = null;
@@ -223,11 +195,22 @@ public class ArrayIndexedCollection implements List {
 		modificationCount++;
 	}
 
+	/**
+	 * Implementation of <code>ElementsGetter</code> for
+	 * <code>ArrayIndexedCollection</code>
+	 */
 	private static class Getter implements ElementsGetter {
 		private int index;
 		private final long savedModificationCount;
 		private final ArrayIndexedCollection collection;
 
+		/**
+		 * Constructor using the <code>ArrayIndexedCollection</code> reference to
+		 * instance <code>ElementsGetter</code> for it
+		 * 
+		 * @param collection <code>ArrayIndexedCollection</code> of which
+		 *                   <code>Getter</code> is instantiated
+		 */
 		public Getter(ArrayIndexedCollection collection) {
 			this.collection = collection;
 			this.savedModificationCount = collection.modificationCount;
@@ -245,11 +228,22 @@ public class ArrayIndexedCollection implements List {
 			return collection.elements[index++];
 		}
 
+		/**
+		 * Checks whether there is next element
+		 * 
+		 * @throws NoSuchElementException if there is no element to retrieve
+		 */
 		private void checkNextElement() {
 			if (!hasNextElement())
 				throw new NoSuchElementException("No element to get");
 		}
 
+		/**
+		 * Checks whether collection was modified during iteration
+		 * 
+		 * @throws <code>ConcurrentModificationException</code> if there was
+		 * <code>Collection</code> modificaton
+		 */
 		private void checkConcurrentModification() {
 			if (savedModificationCount != collection.modificationCount)
 				throw new ConcurrentModificationException();
