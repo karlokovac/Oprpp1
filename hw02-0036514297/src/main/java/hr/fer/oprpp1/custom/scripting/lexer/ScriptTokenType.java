@@ -1,5 +1,8 @@
 package hr.fer.oprpp1.custom.scripting.lexer;
 
-public enum TokenType {
+/**
+ * Enumeration modeling possible types of tokens
+ */
+public enum ScriptTokenType {
 	EOF, WORD, NUMBER, SYMBOL
 }

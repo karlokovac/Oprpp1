@@ -1,5 +1,8 @@
 package hr.fer.oprpp1.custom.scripting.lexer;
 
-public enum LexerState {
-	BASIC,EXTENDED
+/**
+ * Enumeration of possible states during lexical analysis
+ */
+public enum ScriptLexerState {
+	BASIC, EXTENDED
 }

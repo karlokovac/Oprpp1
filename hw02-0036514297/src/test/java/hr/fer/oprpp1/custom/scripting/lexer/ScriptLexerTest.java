@@ -5,51 +5,51 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-public class LexerTest {
+public class ScriptLexerTest {
 
 	@Test
 	public void testConstructorPassingNull() {
-		assertThrows(NullPointerException.class, () -> new Lexer(null));
+		assertThrows(NullPointerException.class, () -> new ScriptLexer(null));
 	}
 
 	@Test
 	public void testEmptyDocument() {
-		Lexer lex = new Lexer("");
-		assertEquals(TokenType.EOF, lex.nextToken().getType());
+		ScriptLexer lex = new ScriptLexer("");
+		assertEquals(ScriptTokenType.EOF, lex.nextToken().getType());
 	}
 
 	@Test
 	public void testCallingAfterEOF() {
-		Lexer lex = new Lexer("");
+		ScriptLexer lex = new ScriptLexer("");
 		lex.nextToken();
-		assertThrows(LexerException.class, () -> lex.nextToken());
+		assertThrows(ScriptLexerException.class, () -> lex.nextToken());
 	}
 
 	@Test
-	private void testAllBlanks() {
-		Lexer lex = new Lexer("                    ");
-		assertEquals(TokenType.EOF, lex.nextToken().getType());
+	public void testAllBlanks() {
+		ScriptLexer lex = new ScriptLexer("                    ");
+		assertEquals(ScriptTokenType.EOF, lex.nextToken().getType());
 	}
 
 	@Test
-	private void testSingleWord() {
-		Lexer lex = new Lexer("  Rimac");
-		checkToken(new Token(TokenType.WORD, "Rimac"), lex.getToken());
+	public void testSingleWord() {
+		ScriptLexer lex = new ScriptLexer("Rimac");
+		var actual = new ScriptToken[] { new ScriptToken(ScriptTokenType.WORD, "Rimac"),
+				new ScriptToken(ScriptTokenType.EOF, null) };
+		checkTokenStream(lex, actual);
 	}
 
-	private void checkToken(Token expected, Token actual) {
-		String msg = "Token are not equal.";
+	public void checkToken(ScriptToken expected, ScriptToken actual, String msg) {
 		assertEquals(expected.getType(), actual.getType(), msg);
 		assertEquals(expected.getValue(), actual.getValue(), msg);
 	}
 
-	private void checkTokenStream(Lexer lexer, Token[] correctData) {
+	private void checkTokenStream(ScriptLexer lexer, ScriptToken[] correctData) {
 		int counter = 0;
-		for (Token expected : correctData) {
-			Token actual = lexer.nextToken();
+		for (ScriptToken expected : correctData) {
+			ScriptToken actual = lexer.nextToken();
 			String msg = "Checking token " + counter + ":";
-			assertEquals(expected.getType(), actual.getType(), msg);
-			assertEquals(expected.getValue(), actual.getValue(), msg);
+			checkToken(expected, actual, msg);
 			counter++;
 		}
 	}
