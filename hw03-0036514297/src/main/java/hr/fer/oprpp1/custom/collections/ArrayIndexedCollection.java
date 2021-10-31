@@ -113,8 +113,8 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	@Override
 	public int indexOf(Object value) {
 		if (value != null)
-			for (int i = 0; i < elements.length; i++)
-				if (value.equals(elements[i]))
+			for (int i = 0; i < size; i++)
+				if (elements[i].equals(value))
 					return i;
 		return VALUE_IS_NOT_FOUND;
 	}
