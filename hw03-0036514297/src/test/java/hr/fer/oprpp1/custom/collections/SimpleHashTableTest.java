@@ -87,9 +87,17 @@ public class SimpleHashTableTest {
 		assertEquals("[]", table.toString());
 	}
 
+	@Test
+	public void testToString1() {
+		table.put("Key", "Value");
+		assertEquals("[Key=Value]", table.toString());
+	}
+
 	private void fillTable() {
 		table.put("Key", "Value");
 		table.put("Mujo", "Haso");
 		table.put("Knuth", "Donald");
+		// System.out.println(table);
+		//System.out.println(Arrays.toString(table.toArray()));
 	}
 }

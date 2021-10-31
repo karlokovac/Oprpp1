@@ -102,13 +102,13 @@ public class SimpleHashTable<K, V> {
 		return size == 0;
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("[");
-		for (var entry : table) {
+		for (var entry : table)
 			for (; entry != null; entry = entry.next)
 				builder.append(entry.key).append("=").append(entry.value).append(", ");
-		}
 		int lastIndex = builder.lastIndexOf(", ");
 		if (lastIndex != -1)
 			builder.delete(lastIndex, builder.length());
@@ -162,6 +162,10 @@ public class SimpleHashTable<K, V> {
 
 		public void setValue(V value) {
 			this.value = value;
+		}
+
+		public String toString() {
+			return String.format("%s=%s", key, value);
 		}
 	}
 }
