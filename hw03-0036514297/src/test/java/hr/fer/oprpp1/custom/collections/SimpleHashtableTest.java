@@ -4,21 +4,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ConcurrentModificationException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SimpleHashTableTest {
+public class SimpleHashtableTest {
 
-	private SimpleHashTable<String, String> table;
+	private SimpleHashtable<String, String> table;
 
 	@BeforeEach
 	public void setup() {
-		table = new SimpleHashTable<>();
+		table = new SimpleHashtable<>();
 	}
 
 	@Test
 	public void testConstructorWrongArg() {
-		assertThrows(IllegalArgumentException.class, () -> new SimpleHashTable<>(0));
+		assertThrows(IllegalArgumentException.class, () -> new SimpleHashtable<>(0));
 	}
 
 	@Test
@@ -38,7 +40,7 @@ public class SimpleHashTableTest {
 
 	@Test
 	public void testPuttingMultipleInSameSlot() {
-		table = new SimpleHashTable<>(1);
+		table = new SimpleHashtable<>(1);
 		fillTable();
 		assertEquals(3, table.size());
 		assertEquals("Donald", table.get("Knuth"));
@@ -65,7 +67,7 @@ public class SimpleHashTableTest {
 
 	@Test
 	public void testRemoveMiddle() {
-		table = new SimpleHashTable<>(1);
+		table = new SimpleHashtable<>(1);
 		fillTable();
 		assertEquals("Haso", table.remove("Mujo"));
 		assertEquals(2, table.size());
@@ -75,7 +77,7 @@ public class SimpleHashTableTest {
 
 	@Test
 	public void testRemoveLast() {
-		table = new SimpleHashTable<>(1);
+		table = new SimpleHashtable<>(1);
 		fillTable();
 		assertEquals("Donald", table.remove("Knuth"));
 		assertEquals(2, table.size());
@@ -93,11 +95,32 @@ public class SimpleHashTableTest {
 		assertEquals("[Key=Value]", table.toString());
 	}
 
+	@Test
+	public void checkMultipleRemove() {
+		fillTable();
+		var it = table.iterator();
+		it.next();
+		it.remove();
+		assertThrows(IllegalStateException.class, () -> it.remove());
+	}
+
+	@Test
+	public void checkModificationCount() {
+		fillTable();
+		var it = table.iterator();
+		it.next();
+		table.clear();
+		assertThrows(ConcurrentModificationException.class, () -> it.next());
+		assertThrows(ConcurrentModificationException.class, () -> it.hasNext());
+		assertThrows(ConcurrentModificationException.class, () -> it.remove());
+
+	}
+
 	private void fillTable() {
 		table.put("Key", "Value");
 		table.put("Mujo", "Haso");
 		table.put("Knuth", "Donald");
 		// System.out.println(table);
-		//System.out.println(Arrays.toString(table.toArray()));
+		// System.out.println(Arrays.toString(table.toArray()));
 	}
 }
