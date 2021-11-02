@@ -8,29 +8,18 @@ import java.util.NoSuchElementException;
 
 public class LinkedListIndexedCollection<T> implements List<T> {
 
-	/**
-	 * Constant indicating value isn't found
-	 */
+	/** Constant indicating value isn't found */
 	private static final int VALUE_IS_NOT_FOUND = -1;
-
-	/**
-	 * Current size of collection
-	 */
+	/** Current size of collection */
 	private int size;
-	/**
-	 * Reference to the first node of the linked list
-	 */
+	/** Reference to the first node of the linked list */
 	private ListNode<T> first;
-	/**
-	 * Reference to the last node of the linked list
-	 */
+	/** Reference to the last node of the linked list */
 	private ListNode<T> last;
-
+	/** Keeps track of modifications preformed */
 	private long modificationCount;
 
-	/**
-	 * Default constructor
-	 */
+	/** Default constructor */
 	public LinkedListIndexedCollection() {
 		size = 0;
 		first = null;
@@ -48,9 +37,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 		addAll(requireNonNull(other));
 	}
 
-	/**
-	 * @throws NullPointerException if <code>value</code> is <code>null</code>
-	 */
+	/** @throws NullPointerException if <code>value</code> is <code>null</code> */
 	@Override
 	public void add(T value) {
 		append(requireNonNull(value));
@@ -232,9 +219,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 		modificationCount++;
 	}
 
-	/**
-	 * Element of linked list
-	 */
+	/** Element of linked list */
 	private static class ListNode<T> {
 		private ListNode<T> previous;
 		private ListNode<T> next;
@@ -247,9 +232,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 		}
 	}
 
-	/**
-	 * Implementation of ElementsGetter for {@link LinkedListIndexedCollection}
-	 */
+	/** Implementation of ElementsGetter for {@link LinkedListIndexedCollection} */
 	private static class Getter<T> implements ElementsGetter<T> {
 
 		private ListNode<T> node;

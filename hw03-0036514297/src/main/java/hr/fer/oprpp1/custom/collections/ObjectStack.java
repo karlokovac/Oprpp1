@@ -1,14 +1,10 @@
 package hr.fer.oprpp1.custom.collections;
 
 public class ObjectStack {
-	/**
-	 * Array used for internal storage of stack
-	 */
+	/** Array adapted for internal storage of stack */
 	private ArrayIndexedCollection<Object> internal;
 
-	/**
-	 * Default constructor
-	 */
+	/** Default constructor */
 	public ObjectStack() {
 		internal = new ArrayIndexedCollection<>();
 	}
@@ -66,9 +62,7 @@ public class ObjectStack {
 
 	}
 
-	/**
-	 * Removes all elements from stack
-	 */
+	/** Removes all elements from stack */
 	public void clear() {
 		internal.clear();
 	}

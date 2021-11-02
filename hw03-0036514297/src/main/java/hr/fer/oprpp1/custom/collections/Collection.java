@@ -3,18 +3,13 @@ package hr.fer.oprpp1.custom.collections;
 public interface Collection<T> {
 
 	/**
-	 * Size constant which represents empty <code>Collection</code>
-	 */
-	int EMPTY = 0;
-
-	/**
 	 * Returns <code>true</code> if collection contains no objects and
 	 * <code>false</code> otherwise
 	 * 
 	 * @return boolean state
 	 */
 	default boolean isEmpty() {
-		return size() == EMPTY;
+		return size() == 0;
 	}
 
 	/**

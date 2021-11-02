@@ -113,7 +113,18 @@ public class SimpleHashtableTest {
 		assertThrows(ConcurrentModificationException.class, () -> it.next());
 		assertThrows(ConcurrentModificationException.class, () -> it.hasNext());
 		assertThrows(ConcurrentModificationException.class, () -> it.remove());
-
+	}
+	
+	@Test
+	public void checkMultipleIteratorsModifying() {
+		fillTable();
+		var it1 = table.iterator();
+		var it2 = table.iterator();
+		it1.next();
+		it1.remove();
+		assertThrows(ConcurrentModificationException.class, () -> it2.next());
+		assertThrows(ConcurrentModificationException.class, () -> it2.hasNext());
+		assertThrows(ConcurrentModificationException.class, () -> it2.remove());
 	}
 
 	private void fillTable() {
