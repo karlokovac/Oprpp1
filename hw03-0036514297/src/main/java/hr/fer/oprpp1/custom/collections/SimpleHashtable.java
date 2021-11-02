@@ -110,11 +110,10 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @return true if key is present
 	 */
 	public boolean containsValue(Object value) {
-		for (var entry : table) {
-			for (; entry != null; entry = entry.next)
-				if (entry.value.equals(value))
-					return true;
-		}
+		for (var entry : this)
+			if (entry.value.equals(value))
+				return true;
+
 		return false;
 	}
 
@@ -148,10 +147,8 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	public TableEntry<K, V>[] toArray() {
 		TableEntry<K, V>[] array = (TableEntry<K, V>[]) new TableEntry[size];
 		int index = 0;
-		for (var entry : table) {
-			for (; entry != null; entry = entry.next)
-				array[index++] = entry;
-		}
+		for (var entry : this)
+			array[index++] = entry;
 		return array;
 	}
 
@@ -171,9 +168,8 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("[");
-		for (var entry : table)
-			for (; entry != null; entry = entry.next)
-				builder.append(entry.key).append("=").append(entry.value).append(", ");
+		for (var entry : this)
+			builder.append(entry.key).append("=").append(entry.value).append(", ");
 		int lastIndex = builder.lastIndexOf(", ");
 		if (lastIndex != -1)
 			builder.delete(lastIndex, builder.length());
@@ -188,7 +184,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @param key witches slot is calculated
 	 * @return slot where it is stored
 	 */
-	private int indexOf(Object key) {
+	private int slotFor(Object key) {
 		return key.hashCode() & (table.length - 1);
 	}
 
@@ -200,7 +196,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 */
 	private TableEntry<K, V> queryKey(Object key) {
 		if (key != null) {
-			var entry = table[indexOf(key)];
+			var entry = table[slotFor(key)];
 			for (; entry != null; entry = entry.next) {
 				if (entry.key.equals(key))
 					return entry;
@@ -218,7 +214,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @return old value if it was present, <code>null</code> otherwise
 	 */
 	private V insert(K key, V value) {
-		var slot = indexOf(key);
+		var slot = slotFor(key);
 		var entry = table[slot];
 		if (entry == null) {
 			table[slot] = new TableEntry<>(key, value, null);
@@ -255,7 +251,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @return old value if it was present, <code>null</code> otherwise
 	 */
 	private V removeEntry(Object key) {
-		int slot = indexOf(key);
+		int slot = slotFor(key);
 		var entry = table[slot];
 		if (entry.key.equals(key)) {
 			V value = entry.value;

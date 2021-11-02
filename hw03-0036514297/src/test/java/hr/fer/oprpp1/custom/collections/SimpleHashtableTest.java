@@ -114,7 +114,7 @@ public class SimpleHashtableTest {
 		assertThrows(ConcurrentModificationException.class, () -> it.hasNext());
 		assertThrows(ConcurrentModificationException.class, () -> it.remove());
 	}
-	
+
 	@Test
 	public void checkMultipleIteratorsModifying() {
 		fillTable();
