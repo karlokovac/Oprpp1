@@ -42,7 +42,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	@SuppressWarnings("unchecked")
 	public SimpleHashtable(int capacity) {
 		if (capacity < 1)
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Initial capacity must be greater than 1");
 		int twoExponent = ALL_BITS_ONE >>> Integer.numberOfLeadingZeros(capacity - 1);
 		twoExponent = (twoExponent < 0) ? 1 : twoExponent + 1;
 		table = (TableEntry<K, V>[]) new TableEntry[twoExponent];
@@ -58,7 +58,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @throws NullPointerException if the key is <code>null</code>
 	 */
 	public V put(K key, V value) {
-		Objects.requireNonNull(key);
+		Objects.requireNonNull(key, "Key must not be null reference");
 		V oldValue = insert(key, value);
 		if (oldValue == null) {
 			size++;
@@ -300,7 +300,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 		@Override
 		public TableEntry<K, V> next() {
 			if (!hasNext())
-				throw new NoSuchElementException();
+				throw new NoSuchElementException("No next element for iteration");
 			lastReturned = entry;
 			assignNextElement();
 			return lastReturned;
@@ -310,7 +310,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 		public void remove() {
 			checkModificationCount();
 			if (lastReturned == null || !containsKey(lastReturned.key))
-				throw new IllegalStateException();
+				throw new IllegalStateException("Illegal remove call");
 			removeEntry(lastReturned.key);
 			savedModificationCount++;
 		}
@@ -337,7 +337,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 		/** Checks whether modification counts match */
 		private void checkModificationCount() {
 			if (savedModificationCount != modificationCount)
-				throw new ConcurrentModificationException();
+				throw new ConcurrentModificationException("Unexpected modification occured while iterating");
 		}
 	}
 
