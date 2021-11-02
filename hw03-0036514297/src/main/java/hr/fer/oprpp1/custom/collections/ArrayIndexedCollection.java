@@ -9,34 +9,22 @@ import static java.util.Objects.requireNonNull;
 
 public class ArrayIndexedCollection<T> implements List<T> {
 
-	/**
-	 * Constant indicating no presence of value
-	 */
+	/** Constant indicating no presence of value */
 	private static final int VALUE_IS_NOT_FOUND = -1;
-	/**
-	 * Default size of internal array
-	 */
+	/** Default size of internal array */
 	private static final int DEFAULT_CAPACITY = 16;
-	/**
-	 * Minimal size of internal array
-	 */
+	/** Minimal size of internal array */
 	private static final int MIN_SIZE = 1;
 
-	/**
-	 * Current size of collection
-	 */
+	/** Current size of collection */
 	private int size;
 
-	/**
-	 * An array of object references which length determines its current capacity
-	 */
+	/** An array of object references storing elements */
 	private T[] elements;
 
 	private long modificationCount;
 
-	/**
-	 * Default constructor setting capacity to default size
-	 */
+	/** Default constructor setting capacity to default size */
 	public ArrayIndexedCollection() {
 		this(DEFAULT_CAPACITY);
 	}
@@ -49,7 +37,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	@SuppressWarnings("unchecked")
 	public ArrayIndexedCollection(int initialCapacity) {
 		if (initialCapacity < MIN_SIZE)
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Initial capacity can't be less than " + MIN_SIZE);
 		elements = (T[]) new Object[initialCapacity];
 	}
 
@@ -72,17 +60,15 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public ArrayIndexedCollection(Collection<? extends T> other, int initialCapacity) {
-		requireNonNull(other);
+		requireNonNull(other, "Reference to other collection must not be null");
 		size = other.size();
 		elements = (T[]) Arrays.copyOf(other.toArray(), Math.max(initialCapacity, size));
 	}
 
-	/**
-	 * @throws NullPointerException if <code>value</code> is <code>null</code>
-	 */
+	/** @throws NullPointerException if <code>value</code> is <code>null</code> */
 	@Override
 	public void add(T value) {
-		requireNonNull(value);
+		requireNonNull(value, "Can't add null");
 		reallocateIfFull();
 		elements[size++] = value;
 	}
@@ -103,7 +89,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	@Override
 	public void insert(T value, int position) {
 		checkIndex(position, size + 1);
-		requireNonNull(value);
+		requireNonNull(value, "Can't insert null");
 		reallocateIfFull();
 		shiftRightFrom(position);
 		elements[position] = value;
@@ -163,9 +149,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 		return new Getter<T>(this);
 	}
 
-	/**
-	 * Duplicates backing array if it's full
-	 */
+	/** Duplicates backing array if it's full */
 	private void reallocateIfFull() {
 		if (size == elements.length) {
 			elements = Arrays.copyOf(elements, elements.length * 2);
@@ -220,35 +204,16 @@ public class ArrayIndexedCollection<T> implements List<T> {
 
 		@Override
 		public boolean hasNextElement() {
+			if (savedModificationCount != collection.modificationCount)
+				throw new ConcurrentModificationException("Unexpected modification while iterating");
 			return index < collection.size;
 		}
 
 		@Override
 		public T getNextElement() {
-			checkConcurrentModification();
-			checkNextElement();
-			return collection.elements[index++];
-		}
-
-		/**
-		 * Checks whether there is next element
-		 * 
-		 * @throws NoSuchElementException if there is no element to retrieve
-		 */
-		private void checkNextElement() {
 			if (!hasNextElement())
 				throw new NoSuchElementException("No element to get");
-		}
-
-		/**
-		 * Checks whether collection was modified during iteration
-		 * 
-		 * @throws <code>ConcurrentModificationException</code> if there was
-		 * <code>Collection</code> modificaton
-		 */
-		private void checkConcurrentModification() {
-			if (savedModificationCount != collection.modificationCount)
-				throw new ConcurrentModificationException();
+			return collection.elements[index++];
 		}
 	}
 

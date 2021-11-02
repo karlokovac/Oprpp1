@@ -34,13 +34,15 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 	 */
 	public LinkedListIndexedCollection(Collection<? extends T> other) {
 		this();
-		addAll(requireNonNull(other));
+		requireNonNull(other, "Collection reference musn't be null");
+		addAll(other);
 	}
 
 	/** @throws NullPointerException if <code>value</code> is <code>null</code> */
 	@Override
 	public void add(T value) {
-		append(requireNonNull(value));
+		requireNonNull(value, "Can't add null");
+		append(value);
 	}
 
 	@Override
@@ -248,38 +250,20 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 
 		@Override
 		public boolean hasNextElement() {
+			if (savedModificationCount != collection.modificationCount)
+				throw new ConcurrentModificationException("Unexpected modification during iteration");
 			return node != null;
 		}
 
 		@Override
 		public T getNextElement() {
-			checkConcurrentModification();
-			checkNextElement();
+			if (!hasNextElement())
+				throw new NoSuchElementException("No next element to iterate");
 			var next = node;
 			node = node.next;
 			return next.value;
 		}
 
-		/**
-		 * Checks whether there is next element
-		 * 
-		 * @throws NoSuchElementException if there is no next element
-		 */
-		private void checkNextElement() {
-			if (!hasNextElement())
-				throw new NoSuchElementException();
-		}
-
-		/**
-		 * Checks whether <code>Collection</code> was modified during iteration
-		 * 
-		 * @throws ConcurrentModificationException if {@link Collection} was modified
-		 *                                         during iteration
-		 */
-		private void checkConcurrentModification() {
-			if (savedModificationCount != collection.modificationCount)
-				throw new ConcurrentModificationException();
-		}
 	}
 
 }

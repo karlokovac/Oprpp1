@@ -46,7 +46,7 @@ public class Dictionary<K, V> {
 	 * @throws NullPointerException if key is null
 	 */
 	public V put(K key, V value) {
-		Objects.requireNonNull(key);
+		Objects.requireNonNull(key, "Key musn't be null");
 		int index = internal.indexOf(key);
 		if (index != -1) {
 			return internal.get(index).setValue(value);
