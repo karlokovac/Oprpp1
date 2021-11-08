@@ -62,10 +62,10 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 		V oldValue = insert(key, value);
 		if (oldValue == null) {
 			size++;
-			modificationCount++;
 			if ((float) size / table.length >= FULLNESS_THRESHOLD)
 				reallocateTable();
 		}
+		modificationCount++;
 		return oldValue;
 	}
 
@@ -197,10 +197,9 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	private TableEntry<K, V> queryKey(Object key) {
 		if (key != null) {
 			var entry = table[slotFor(key)];
-			for (; entry != null; entry = entry.next) {
+			for (; entry != null; entry = entry.next)
 				if (entry.key.equals(key))
 					return entry;
-			}
 		}
 		return null;
 	}
