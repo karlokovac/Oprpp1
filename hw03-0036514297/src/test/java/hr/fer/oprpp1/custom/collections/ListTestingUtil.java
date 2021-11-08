@@ -9,16 +9,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 abstract class ListTestingUtil {
-	
+
 	protected List<Object> collection;
-	
+
 	protected abstract List<Object> createInstance();
-	
+
 	@BeforeEach
 	public void setup() {
 		collection = createInstance();
 	}
-	
+
 	@Test
 	public void testAdding() {
 		collection.add("Seat");
@@ -52,10 +52,30 @@ abstract class ListTestingUtil {
 	}
 
 	@Test
-	public void testInsertOne() {
+	public void testInsertWhenEmpty() {
 		var rimac = "Rimac";
 		Object[] expected = new Object[] { rimac };
 		collection.insert(rimac, 0);
+		assertArrayEquals(expected, collection.toArray());
+	}
+
+	@Test
+	public void testFirstWhenNotEmpty() {
+		var tesla = "Tesla";
+		var rimac = "Rimac";
+		Object[] expected = new Object[] { rimac, tesla };
+		collection.add(tesla);
+		collection.insert(rimac, 0);
+		assertArrayEquals(expected, collection.toArray());
+	}
+
+	@Test
+	public void testLastWhenNotEmpty() {
+		var tesla = "Tesla";
+		var rimac = "Rimac";
+		Object[] expected = new Object[] { rimac, tesla };
+		collection.add(rimac);
+		collection.insert(tesla, 1);
 		assertArrayEquals(expected, collection.toArray());
 	}
 

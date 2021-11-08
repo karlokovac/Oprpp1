@@ -5,12 +5,14 @@ import java.util.Objects;
 /** Data structure for storing key-value pairs */
 public class Dictionary<K, V> {
 
+	/** Index to signal value isn't found */
+	private final static int VALUE_NOT_FOUND = 1;
 	/** List adapted for internal storage */
-	private List<Pair> internal;
+	private final List<Pair> internal;
 
 	/** Default constructor */
 	public Dictionary() {
-		internal = new ArrayIndexedCollection<>();
+		internal = new LinkedListIndexedCollection<>();
 	}
 
 	/**
@@ -47,8 +49,8 @@ public class Dictionary<K, V> {
 	 */
 	public V put(K key, V value) {
 		Objects.requireNonNull(key, "Key musn't be null");
-		int index = internal.indexOf(key);
-		if (index != -1) {
+		int index = indexOfKey(key);
+		if (index != VALUE_NOT_FOUND) {
 			return internal.get(index).setValue(value);
 		}
 		internal.add(new Pair(key, value));
@@ -62,8 +64,8 @@ public class Dictionary<K, V> {
 	 * @return value if the key exists, <code>null</code> otherwise
 	 */
 	public V get(Object key) {
-		int index = internal.indexOf(key);
-		if (index != -1)
+		int index = indexOfKey(key);
+		if (index != VALUE_NOT_FOUND)
 			return internal.get(index).value;
 		return null;
 	}
@@ -75,13 +77,26 @@ public class Dictionary<K, V> {
 	 * @return value of removed Pair, <code>null</code> otherwise
 	 */
 	public V remove(K key) {
-		int index = internal.indexOf(key);
-		if (index != -1) {
+		int index = indexOfKey(key);
+		if (index != VALUE_NOT_FOUND) {
 			V stored = internal.get(index).value;
 			internal.remove(index);
 			return stored;
 		}
 		return null;
+	}
+
+	/**
+	 * Searches the index of the given key
+	 * 
+	 * @param key to search for
+	 * @return index of the key, otherwise
+	 */
+	private int indexOfKey(Object key) {
+		for (int i = 0; i < internal.size(); i++)
+			if (internal.get(i).key.equals(key))
+				return i;
+		return VALUE_NOT_FOUND;
 	}
 
 	/** Data structure representing an entry */
@@ -110,17 +125,6 @@ public class Dictionary<K, V> {
 			V oldValue = value;
 			value = newValue;
 			return oldValue;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (key.getClass() != obj.getClass())
-				return false;
-			return Objects.equals(key, obj);
 		}
 
 	}

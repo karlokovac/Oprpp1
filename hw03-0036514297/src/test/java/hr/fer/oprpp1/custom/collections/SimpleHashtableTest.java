@@ -131,7 +131,7 @@ public class SimpleHashtableTest {
 		table.put("Key", "Value");
 		table.put("Mujo", "Haso");
 		table.put("Knuth", "Donald");
-		// System.out.println(table);
+		System.out.println(table);
 		// System.out.println(Arrays.toString(table.toArray()));
 	}
 }

@@ -22,8 +22,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 	/** Default constructor */
 	public LinkedListIndexedCollection() {
 		size = 0;
-		first = null;
-		last = null;
+		first = last = null;
 	}
 
 	/**
@@ -160,7 +159,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 		size++;
 		modificationCount++;
 	}
-
+	
 	/**
 	 * Add element in the middle of two other existing elements. There <b>must</b>
 	 * an element before and after it
