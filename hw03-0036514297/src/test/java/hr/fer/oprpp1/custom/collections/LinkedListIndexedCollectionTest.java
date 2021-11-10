@@ -24,10 +24,10 @@ public class LinkedListIndexedCollectionTest extends ListTestingUtil {
 		var mercedes = "Mercedes";
 		var bmw = "BMW";
 		Object[] expected = new Object[] { volkswagen, mercedes, bmw };
-		collection.add(volkswagen);
-		collection.add(mercedes);
-		collection.add(bmw);
-		var col = new LinkedListIndexedCollection<>(collection);
+		list.add(volkswagen);
+		list.add(mercedes);
+		list.add(bmw);
+		var col = new LinkedListIndexedCollection<>(list);
 		assertArrayEquals(expected, col.toArray());
 	}
 

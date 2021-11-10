@@ -8,15 +8,16 @@ import java.util.NoSuchElementException;
 
 public class LinkedListIndexedCollection<T> implements List<T> {
 
-	/** Constant indicating value isn't found */
-	private static final int VALUE_IS_NOT_FOUND = -1;
+	private static final String NULL_REF_COLLECTION_MSG = "Collection can't be a null reference";
+	private static final String NULL_REF_VAL_MSG = "Value can't be null reference";
+
 	/** Current size of collection */
 	private int size;
 	/** Reference to the first node of the linked list */
 	private ListNode<T> first;
 	/** Reference to the last node of the linked list */
 	private ListNode<T> last;
-	/** Keeps track of modifications preformed */
+	/** Keeps track of modifications performed */
 	private long modificationCount;
 
 	/** Default constructor */
@@ -33,14 +34,14 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 	 */
 	public LinkedListIndexedCollection(Collection<? extends T> other) {
 		this();
-		requireNonNull(other, "Collection reference musn't be null");
+		requireNonNull(other, NULL_REF_COLLECTION_MSG);
 		addAll(other);
 	}
 
 	/** @throws NullPointerException if <code>value</code> is <code>null</code> */
 	@Override
 	public void add(T value) {
-		requireNonNull(value, "Can't add null");
+		requireNonNull(value, NULL_REF_VAL_MSG);
 		append(value);
 	}
 
@@ -59,7 +60,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 
 	@Override
 	public void insert(T value, int position) {
-		requireNonNull(value);
+		requireNonNull(value, NULL_REF_VAL_MSG);
 		checkIndex(position, size + 1);
 
 		if (position == size)
@@ -79,7 +80,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 				if (node.value.equals(value))
 					return i;
 		}
-		return VALUE_IS_NOT_FOUND;
+		return VALUE_NOT_FOUND;
 	}
 
 	@Override
@@ -94,23 +95,22 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 
 	@Override
 	public boolean contains(Object value) {
-		return indexOf(value) != VALUE_IS_NOT_FOUND;
+		return indexOf(value) != VALUE_NOT_FOUND;
 	}
 
 	@Override
 	public boolean remove(Object value) {
 		int index = indexOf(value);
-		if (index != VALUE_IS_NOT_FOUND) {
-			remove(index);
-			return true;
-		}
-		return false;
+		if (index == VALUE_NOT_FOUND)
+			return false;
+		remove(index);
+		return true;
 	}
 
 	@Override
 	public Object[] toArray() {
 		Object[] array = new Object[size];
-		ListNode<T> node = first;
+		var node = first;
 		for (int i = 0; i < size; i++, node = node.next)
 			array[i] = node.value;
 		return array;
@@ -118,9 +118,8 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 
 	@Override
 	public void forEach(Processor<? super T> processor) {
-		for (var node = first; node != null; node = node.next) {
+		for (var node = first; node != null; node = node.next)
 			processor.process(node.value);
-		}
 	}
 
 	@Override
@@ -150,7 +149,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 	 * @param value to be added
 	 */
 	private void prepend(T value) {
-		ListNode<T> element = new ListNode<>(null, first, value);
+		var element = new ListNode<T>(null, first, value);
 		if (isEmpty())
 			last = element;
 		else
@@ -159,7 +158,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 		size++;
 		modificationCount++;
 	}
-	
+
 	/**
 	 * Add element in the middle of two other existing elements. There <b>must</b>
 	 * an element before and after it
@@ -169,7 +168,7 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 	 */
 	private void insertInTheMiddle(T value, int position) {
 		var node = getNode(position);
-		var inserted = new ListNode<>(node.previous, node, value);
+		var inserted = new ListNode<T>(node.previous, node, value);
 		node.previous.next = inserted;
 		node.previous = inserted;
 		size++;
@@ -202,21 +201,22 @@ public class LinkedListIndexedCollection<T> implements List<T> {
 	 * @param node to be removed
 	 */
 	private void removeNode(ListNode<T> node) {
-		if (size == 1)
+		if (size == 1) {
 			clear();
-		else {
-			if (node == first) {
-				node.next.previous = null;
-				first = node.next;
-			} else if (node == last) {
-				node.previous.next = null;
-				last = node.previous;
-			} else {
-				node.previous.next = node.next;
-				node.next.previous = node.previous;
-			}
-			size--;
+			return;
 		}
+
+		if (node == first) {
+			node.next.previous = null;
+			first = node.next;
+		} else if (node == last) {
+			node.previous.next = null;
+			last = node.previous;
+		} else {
+			node.previous.next = node.next;
+			node.next.previous = node.previous;
+		}
+		size--;
 		modificationCount++;
 	}
 

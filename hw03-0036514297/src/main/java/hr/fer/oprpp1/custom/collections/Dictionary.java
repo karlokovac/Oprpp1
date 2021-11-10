@@ -6,7 +6,7 @@ import java.util.Objects;
 public class Dictionary<K, V> {
 
 	/** Index to signal value isn't found */
-	private final static int VALUE_NOT_FOUND = 1;
+	private final static int VALUE_NOT_FOUND = -1;
 	/** List adapted for internal storage */
 	private final List<Pair> internal;
 
@@ -21,7 +21,7 @@ public class Dictionary<K, V> {
 	 * @return <code>true</code> if empty, <code>false</code> otherwise
 	 */
 	public boolean isEmpty() {
-		return internal.size() == 0;
+		return internal.isEmpty();
 	}
 
 	/**
@@ -50,9 +50,8 @@ public class Dictionary<K, V> {
 	public V put(K key, V value) {
 		Objects.requireNonNull(key, "Key musn't be null");
 		int index = indexOfKey(key);
-		if (index != VALUE_NOT_FOUND) {
+		if (index != VALUE_NOT_FOUND)
 			return internal.get(index).setValue(value);
-		}
 		internal.add(new Pair(key, value));
 		return null;
 	}
@@ -65,9 +64,9 @@ public class Dictionary<K, V> {
 	 */
 	public V get(Object key) {
 		int index = indexOfKey(key);
-		if (index != VALUE_NOT_FOUND)
-			return internal.get(index).value;
-		return null;
+		if (index == VALUE_NOT_FOUND)
+			return null;
+		return internal.get(index).value;
 	}
 
 	/**
@@ -78,12 +77,11 @@ public class Dictionary<K, V> {
 	 */
 	public V remove(K key) {
 		int index = indexOfKey(key);
-		if (index != VALUE_NOT_FOUND) {
-			V stored = internal.get(index).value;
-			internal.remove(index);
-			return stored;
-		}
-		return null;
+		if (index == VALUE_NOT_FOUND)
+			return null;
+		V stored = internal.get(index).value;
+		internal.remove(index);
+		return stored;
 	}
 
 	/**

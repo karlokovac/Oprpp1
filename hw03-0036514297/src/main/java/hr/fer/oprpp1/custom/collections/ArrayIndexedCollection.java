@@ -9,12 +9,13 @@ import static java.util.Objects.requireNonNull;
 
 public class ArrayIndexedCollection<T> implements List<T> {
 
-	/** Constant indicating no presence of value */
-	private static final int VALUE_IS_NOT_FOUND = -1;
 	/** Default size of internal array */
 	private static final int DEFAULT_CAPACITY = 16;
 	/** Minimal size of internal array */
 	private static final int MIN_SIZE = 1;
+	private static final String INIT_CAP_TOO_SMALL_MSG = "Initial capacity can't be less than " + MIN_SIZE;
+	private static final String NULL_REF_COLLECTION_MSG = "Collection can't be a null reference";
+	private static final String NULL_REF_VAL_MSG = "Value can't be null reference";
 
 	/** Current size of collection */
 	private int size;
@@ -37,7 +38,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	@SuppressWarnings("unchecked")
 	public ArrayIndexedCollection(int initialCapacity) {
 		if (initialCapacity < MIN_SIZE)
-			throw new IllegalArgumentException("Initial capacity can't be less than " + MIN_SIZE);
+			throw new IllegalArgumentException(INIT_CAP_TOO_SMALL_MSG);
 		elements = (T[]) new Object[initialCapacity];
 	}
 
@@ -60,7 +61,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public ArrayIndexedCollection(Collection<? extends T> other, int initialCapacity) {
-		requireNonNull(other, "Reference to other collection must not be null");
+		requireNonNull(other, NULL_REF_COLLECTION_MSG);
 		size = other.size();
 		elements = (T[]) Arrays.copyOf(other.toArray(), Math.max(initialCapacity, size));
 	}
@@ -68,15 +69,12 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	/** @throws NullPointerException if <code>value</code> is <code>null</code> */
 	@Override
 	public void add(T value) {
-		requireNonNull(value, "Can't add null");
-		reallocateIfFull();
-		elements[size++] = value;
+		insert(value, size);
 	}
 
 	@Override
 	public T get(int index) {
-		checkIndex(index, size);
-		return elements[index];
+		return elements[checkIndex(index, size)];
 	}
 
 	@Override
@@ -89,8 +87,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	@Override
 	public void insert(T value, int position) {
 		checkIndex(position, size + 1);
-		requireNonNull(value, "Can't insert null");
-		reallocateIfFull();
+		requireNonNull(value, NULL_REF_VAL_MSG);
 		shiftRightFrom(position);
 		elements[position] = value;
 		size++;
@@ -102,13 +99,12 @@ public class ArrayIndexedCollection<T> implements List<T> {
 			for (int i = 0; i < size; i++)
 				if (elements[i].equals(value))
 					return i;
-		return VALUE_IS_NOT_FOUND;
+		return VALUE_NOT_FOUND;
 	}
 
 	@Override
 	public void remove(int index) {
 		checkIndex(index, size);
-		elements[index] = null;
 		shiftLeftFrom(index);
 		size--;
 	}
@@ -120,17 +116,16 @@ public class ArrayIndexedCollection<T> implements List<T> {
 
 	@Override
 	public boolean contains(Object value) {
-		return indexOf(value) != VALUE_IS_NOT_FOUND;
+		return indexOf(value) != VALUE_NOT_FOUND;
 	}
 
 	@Override
 	public boolean remove(Object value) {
 		int index = indexOf(value);
-		if (index != VALUE_IS_NOT_FOUND) {
-			remove(index);
-			return true;
-		}
-		return false;
+		if (index == VALUE_NOT_FOUND)
+			return false;
+		remove(index);
+		return true;
 	}
 
 	@Override
@@ -150,7 +145,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	}
 
 	/** Duplicates backing array if it's full */
-	private void reallocateIfFull() {
+	private void checkSize() {
 		if (size == elements.length) {
 			elements = Arrays.copyOf(elements, elements.length * 2);
 			modificationCount++;
@@ -163,9 +158,9 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	 * @param position starting position
 	 */
 	private void shiftRightFrom(int position) {
-		for (int i = size; i > position; i--) {
+		checkSize();
+		for (int i = size; i > position; i--)
 			elements[i] = elements[i - 1];
-		}
 		modificationCount++;
 	}
 
@@ -175,9 +170,9 @@ public class ArrayIndexedCollection<T> implements List<T> {
 	 * @param position starting position
 	 */
 	private void shiftLeftFrom(int position) {
-		for (int i = position; i < size; i++) {
-			elements[i] = elements[i + 1];
-		}
+		for (int i = position + 1; i < size; i++)
+			elements[i - 1] = elements[i];
+		elements[size - 1] = null;
 		modificationCount++;
 	}
 
@@ -202,6 +197,7 @@ public class ArrayIndexedCollection<T> implements List<T> {
 			this.savedModificationCount = collection.modificationCount;
 		}
 
+		/** @throws ConcurrentModificationException if modification occurred */
 		@Override
 		public boolean hasNextElement() {
 			if (savedModificationCount != collection.modificationCount)
@@ -209,6 +205,10 @@ public class ArrayIndexedCollection<T> implements List<T> {
 			return index < collection.size;
 		}
 
+		/**
+		 * @throws ConcurrentModificationException if modification occurred
+		 * @throws NoSuchElementException          if there is no next element
+		 */
 		@Override
 		public T getNextElement() {
 			if (!hasNextElement())

@@ -10,53 +10,53 @@ import org.junit.jupiter.api.Test;
 
 abstract class ListTestingUtil {
 
-	protected List<Object> collection;
+	protected List<Object> list;
 
 	protected abstract List<Object> createInstance();
 
 	@BeforeEach
 	public void setup() {
-		collection = createInstance();
+		list = createInstance();
 	}
 
 	@Test
 	public void testAdding() {
-		collection.add("Seat");
-		assertTrue(collection.contains("Seat"));
+		list.add("Seat");
+		assertTrue(list.contains("Seat"));
 	}
 
 	@Test
 	public void testAddingNull() {
-		assertThrows(NullPointerException.class, () -> collection.add(null));
+		assertThrows(NullPointerException.class, () -> list.add(null));
 	}
 
 	@Test
 	public void testGet() {
 		String expected = "Hyundai";
-		collection.add(expected);
-		assertEquals(expected, collection.get(0));
+		list.add(expected);
+		assertEquals(expected, list.get(0));
 	}
 
 	@Test
 	public void testGetWrongIndex() {
 		String expected = "Hyundai";
-		collection.add(expected);
-		assertThrows(IndexOutOfBoundsException.class, () -> collection.get(1));
+		list.add(expected);
+		assertThrows(IndexOutOfBoundsException.class, () -> list.get(1));
 	}
 
 	@Test
 	public void testClear() {
-		collection.add("Fiat");
-		collection.clear();
-		assertTrue(collection.isEmpty());
+		list.add("Fiat");
+		list.clear();
+		assertTrue(list.isEmpty());
 	}
 
 	@Test
 	public void testInsertWhenEmpty() {
 		var rimac = "Rimac";
 		Object[] expected = new Object[] { rimac };
-		collection.insert(rimac, 0);
-		assertArrayEquals(expected, collection.toArray());
+		list.insert(rimac, 0);
+		assertArrayEquals(expected, list.toArray());
 	}
 
 	@Test
@@ -64,9 +64,9 @@ abstract class ListTestingUtil {
 		var tesla = "Tesla";
 		var rimac = "Rimac";
 		Object[] expected = new Object[] { rimac, tesla };
-		collection.add(tesla);
-		collection.insert(rimac, 0);
-		assertArrayEquals(expected, collection.toArray());
+		list.add(tesla);
+		list.insert(rimac, 0);
+		assertArrayEquals(expected, list.toArray());
 	}
 
 	@Test
@@ -74,9 +74,9 @@ abstract class ListTestingUtil {
 		var tesla = "Tesla";
 		var rimac = "Rimac";
 		Object[] expected = new Object[] { rimac, tesla };
-		collection.add(rimac);
-		collection.insert(tesla, 1);
-		assertArrayEquals(expected, collection.toArray());
+		list.add(rimac);
+		list.insert(tesla, 1);
+		assertArrayEquals(expected, list.toArray());
 	}
 
 	@Test
@@ -85,18 +85,18 @@ abstract class ListTestingUtil {
 		var porsche = "Porsche";
 		var rimac = "Rimac";
 		Object[] expected = new Object[] { rimac, tesla, porsche };
-		collection.add(rimac);
-		collection.add(porsche);
-		collection.insert(tesla, 1);
-		assertArrayEquals(expected, collection.toArray());
+		list.add(rimac);
+		list.add(porsche);
+		list.insert(tesla, 1);
+		assertArrayEquals(expected, list.toArray());
 	}
 
 	@Test
 	public void testIndexOf() {
 		var shelby = "Shelby";
-		collection.add("Chevy");
-		collection.add(shelby);
-		assertEquals(1, collection.indexOf(shelby));
+		list.add("Chevy");
+		list.add(shelby);
+		assertEquals(1, list.indexOf(shelby));
 	}
 
 	@Test
@@ -105,11 +105,23 @@ abstract class ListTestingUtil {
 		var rimac = "Rimac";
 		var porsche = "Porsche";
 		Object[] expected = new Object[] { rimac, porsche };
-		collection.add(tesla);
-		collection.add(rimac);
-		collection.add(porsche);
-		collection.remove(0);
-		assertArrayEquals(expected, collection.toArray());
+		list.add(tesla);
+		list.add(rimac);
+		list.add(porsche);
+		list.remove(0);
+		assertArrayEquals(expected, list.toArray());
+	}
+	
+	@Test
+	public void testRemoveWhenFull() {
+		Object[] expected = new Object[15];
+		list.add(16);
+		for (int i = 0; i < 15; i++) {
+			list.add(i);
+			expected[i] = i;
+		}
+		list.remove(0);
+		assertArrayEquals(expected, list.toArray());
 	}
 
 }

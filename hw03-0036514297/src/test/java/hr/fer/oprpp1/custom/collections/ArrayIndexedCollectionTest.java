@@ -39,10 +39,10 @@ public class ArrayIndexedCollectionTest extends ListTestingUtil {
 		var mercedes = "Mercedes";
 		var bmw = "BMW";
 		Object[] expected = new Object[] { volkswagen, mercedes, bmw };
-		collection.add(volkswagen);
-		collection.add(mercedes);
-		collection.add(bmw);
-		var col = new ArrayIndexedCollection<>(collection);
+		list.add(volkswagen);
+		list.add(mercedes);
+		list.add(bmw);
+		var col = new ArrayIndexedCollection<>(list);
 		assertArrayEquals(expected, col.toArray());
 	}
 
@@ -59,21 +59,21 @@ public class ArrayIndexedCollectionTest extends ListTestingUtil {
 		var mercedes = "Mercedes";
 		var bmw = "BMW";
 		Object[] expected = new Object[] { volkswagen, mercedes, bmw };
-		collection.add(volkswagen);
-		collection.add(mercedes);
-		collection.add(bmw);
-		var col = new ArrayIndexedCollection<>(collection, 0);
+		list.add(volkswagen);
+		list.add(mercedes);
+		list.add(bmw);
+		var col = new ArrayIndexedCollection<>(list, 0);
 		assertArrayEquals(expected, col.toArray());
 	}
 
 	@Test
 	public void testGetWhenReallocated() {
 		String expected = "Hyundai";
-		collection.add("Mazda");
-		collection.add("Honda");
-		collection.add("Toyota");
-		collection.add(expected);
-		assertEquals(expected, collection.get(3));
+		list.add("Mazda");
+		list.add("Honda");
+		list.add("Toyota");
+		list.add(expected);
+		assertEquals(expected, list.get(3));
 	}
 
 }

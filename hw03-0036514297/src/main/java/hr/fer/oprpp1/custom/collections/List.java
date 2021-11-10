@@ -1,6 +1,9 @@
 package hr.fer.oprpp1.custom.collections;
 
 public interface List<T> extends Collection<T> {
+	/** Constant indicating no presence of value */
+	static final int VALUE_NOT_FOUND = -1;
+
 	/**
 	 * Returns the object that is stored at position index. Valid indexes are 0 to
 	 * size-1
@@ -24,7 +27,7 @@ public interface List<T> extends Collection<T> {
 
 	/**
 	 * Searches the collection and returns the index of the first occurrence of the
-	 * given value or -1 if the value is not found
+	 * given value or VALUE_NOT_FOUND if the value is not found
 	 * 
 	 * @param value to be searched for
 	 * @return position of the element

@@ -20,6 +20,11 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	private final static int DEFAULT_CAPACITY = 16;
 	/** Threshold for doubling the array */
 	private final static float FULLNESS_THRESHOLD = 0.75f;
+	/** Minimum capacity of the table */
+	private static final int MIN_CAPACITY = 1;
+
+	private static final String INIT_CAP_TOO_SMALL_MSG = "Initial capacity can't be less than " + MIN_CAPACITY;
+	private static final String NULL_REF_KEY_MSG = "Key must not be null reference";
 
 	/** Array storing <code>TableEntry</code> pairs */
 	private TableEntry<K, V>[] table;
@@ -41,8 +46,8 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 */
 	@SuppressWarnings("unchecked")
 	public SimpleHashtable(int capacity) {
-		if (capacity < 1)
-			throw new IllegalArgumentException("Initial capacity must be greater than 1");
+		if (capacity < MIN_CAPACITY)
+			throw new IllegalArgumentException(INIT_CAP_TOO_SMALL_MSG);
 		int twoExponent = ALL_BITS_ONE >>> Integer.numberOfLeadingZeros(capacity - 1);
 		twoExponent = (twoExponent < 0) ? 1 : twoExponent + 1;
 		table = (TableEntry<K, V>[]) new TableEntry[twoExponent];
@@ -58,7 +63,7 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @throws NullPointerException if the key is <code>null</code>
 	 */
 	public V put(K key, V value) {
-		Objects.requireNonNull(key, "Key must not be null reference");
+		Objects.requireNonNull(key, NULL_REF_KEY_MSG);
 		V oldValue = insert(key, value);
 		if (oldValue == null) {
 			size++;
@@ -76,12 +81,8 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @return value if the key exists, <code>null</code> otherwise
 	 */
 	public V get(Object key) {
-		if (key == null)
-			return null;
 		var entry = queryKey(key);
-		if (entry != null)
-			return entry.value;
-		return null;
+		return entry == null ? null : entry.value;
 	}
 
 	/**
@@ -113,7 +114,6 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 		for (var entry : this)
 			if (entry.value.equals(value))
 				return true;
-
 		return false;
 	}
 
@@ -126,7 +126,25 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	public V remove(Object key) {
 		if (key == null)
 			return null;
-		return removeEntry(key);
+
+		var entry = table[slotFor(key)];
+		var prevEntry = entry;
+		while (entry != null && !entry.key.equals(key)) {
+			prevEntry = entry;
+			entry = entry.next;
+		}
+
+		if (entry == null)
+			return null;
+
+		var oldValue = entry.value;
+		if (entry != prevEntry)
+			prevEntry.next = entry.next;
+		else
+			table[slotFor(key)] = entry.next;
+		size--;
+		modificationCount++;
+		return oldValue;
 	}
 
 	/**
@@ -166,13 +184,12 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		for (var entry : this)
-			builder.append(entry.key).append("=").append(entry.value).append(", ");
-		int lastIndex = builder.lastIndexOf(", ");
-		if (lastIndex != -1)
-			builder.delete(lastIndex, builder.length());
+		if (isEmpty())
+			return "[]";
+		final StringBuilder builder = new StringBuilder().append("[");
+		final var iterator = iterator();
+		builder.append(iterator.next());
+		iterator.forEachRemaining((e) -> builder.append(", ").append(e.key).append("=").append(e.value));
 		return builder.append("]").toString();
 	}
 
@@ -195,12 +212,10 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @return pair containing the key
 	 */
 	private TableEntry<K, V> queryKey(Object key) {
-		if (key != null) {
-			var entry = table[slotFor(key)];
-			for (; entry != null; entry = entry.next)
+		if (key != null)
+			for (var entry = table[slotFor(key)]; entry != null; entry = entry.next)
 				if (entry.key.equals(key))
 					return entry;
-		}
 		return null;
 	}
 
@@ -213,24 +228,24 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 	 * @return old value if it was present, <code>null</code> otherwise
 	 */
 	private V insert(K key, V value) {
-		var slot = slotFor(key);
-		var entry = table[slot];
+		var entry = table[slotFor(key)];
 		if (entry == null) {
-			table[slot] = new TableEntry<>(key, value, null);
+			table[slotFor(key)] = new TableEntry<>(key, value, null);
 			return null;
 		}
-
-		boolean equals;
-		while ((equals = entry.key.equals(key)) || entry.next != null) {
-			if (equals) {
-				var oldValue = entry.value;
-				entry.value = value;
-				return oldValue;
-			}
+		var prevEntry = entry;
+		while (entry != null && !entry.key.equals(key)) {
+			prevEntry = entry;
 			entry = entry.next;
 		}
 
-		entry.next = new TableEntry<>(key, value, null);
+		if (entry != null) {
+			var oldValue = entry.value;
+			entry.value = value;
+			return oldValue;
+		}
+
+		prevEntry.next = new TableEntry<>(key, value, null);
 		return null;
 	}
 
@@ -243,37 +258,9 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 			insert(entry.key, entry.value);
 	}
 
-	/**
-	 * Removes the pair containing given key, if such is present
-	 * 
-	 * @param key of the pair
-	 * @return old value if it was present, <code>null</code> otherwise
-	 */
-	private V removeEntry(Object key) {
-		int slot = slotFor(key);
-		var entry = table[slot];
-		if (entry.key.equals(key)) {
-			V value = entry.value;
-			table[slot] = entry.next;
-			size--;
-			modificationCount++;
-			return value;
-		}
-
-		for (; entry.next != null; entry = entry.next) {
-			if (entry.next.key.equals(key)) {
-				var oldValue = entry.next.value;
-				entry.next = entry.next.next;
-				size--;
-				modificationCount++;
-				return oldValue;
-			}
-		}
-		return null;
-	}
-
 	/** Implementation of the iterator */
 	private class SimpleHashtableIterator implements Iterator<SimpleHashtable.TableEntry<K, V>> {
+		private static final String ILLEGAL_REMOVE = "Illegal remove call while iterating";
 		/** Modification count used to detect concurrent modification */
 		private long savedModificationCount;
 		/** Current index of the table array while iterating */
@@ -290,12 +277,17 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 			assignNextOccupiedSlot();
 		}
 
+		/** @throws ConcurrentModificationException unexpected modification occurred */
 		@Override
 		public boolean hasNext() {
 			checkModificationCount();
 			return entry != null;
 		}
 
+		/**
+		 * @throws ConcurrentModificationException unexpected modification occurred
+		 * @throws NoSuchElementException          if there is no next element
+		 */
 		@Override
 		public TableEntry<K, V> next() {
 			if (!hasNext())
@@ -305,13 +297,27 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 			return lastReturned;
 		}
 
+		/**
+		 * @throws IllegalStateException           if remove was inappropriately called
+		 * @throws ConcurrentModificationException if unexpected modification occurred
+		 */
 		@Override
 		public void remove() {
 			checkModificationCount();
 			if (lastReturned == null || !containsKey(lastReturned.key))
-				throw new IllegalStateException("Illegal remove call");
-			removeEntry(lastReturned.key);
+				throw new IllegalStateException(ILLEGAL_REMOVE);
+			SimpleHashtable.this.remove(lastReturned.key);
 			savedModificationCount++;
+		}
+
+		/**
+		 * Checks whether modification counts match
+		 * 
+		 * @throws ConcurrentModificationException if unexpected modification occurred
+		 */
+		private void checkModificationCount() {
+			if (savedModificationCount != modificationCount)
+				throw new ConcurrentModificationException("Unexpected modification occured while iterating");
 		}
 
 		/** Sets the entry field to the next pair in the table */
@@ -324,19 +330,13 @@ public class SimpleHashtable<K, V> implements Iterable<SimpleHashtable.TableEntr
 
 		/** Sets the entry field to the next head of occupied slot */
 		private void assignNextOccupiedSlot() {
-			for (index++; index < table.length; index++) {
-				if (table[index] != null) {
-					entry = table[index];
-					return;
-				}
-			}
-			entry = null;
-		}
-
-		/** Checks whether modification counts match */
-		private void checkModificationCount() {
-			if (savedModificationCount != modificationCount)
-				throw new ConcurrentModificationException("Unexpected modification occured while iterating");
+			do {
+				index++;
+			} while (index < table.length && table[index] == null);
+			if (index < table.length)
+				entry = table[index];
+			else
+				entry = null;
 		}
 	}
 

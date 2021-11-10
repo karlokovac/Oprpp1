@@ -1,5 +1,6 @@
 package hr.fer.oprpp1.custom.collections;
 
+/** General data structure for storing elements */
 public interface Collection<T> {
 
 	/**
@@ -61,8 +62,7 @@ public interface Collection<T> {
 	 * @param processor <code>Processor</code> to be used
 	 */
 	default void forEach(Processor<? super T> processor) {
-		ElementsGetter<T> getter = createElementsGetter();
-		while (getter.hasNextElement())
+		for (var getter = createElementsGetter(); getter.hasNextElement();)
 			processor.process(getter.getNextElement());
 	}
 
@@ -76,9 +76,7 @@ public interface Collection<T> {
 		other.forEach((value) -> add(value));
 	}
 
-	/**
-	 * Removes all elements from this collection
-	 */
+	/** Removes all elements from this collection */
 	void clear();
 
 	/**
