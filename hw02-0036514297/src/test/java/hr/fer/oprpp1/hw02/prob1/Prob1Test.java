@@ -110,14 +110,8 @@ public class Prob1Test {
 		Lexer lexer = new Lexer("  ab\\1\\2cd\\3 ab\\2\\1cd\\4\\\\ \r\n\t   ");
 
 		// We expect the following stream of tokens
-		Token correctData[] = { new Token(TokenType.WORD, "ab12cd3"), new Token(TokenType.WORD, "ab21cd4\\"), // this is
-																												// 8-letter
-																												// long,
-																												// not
-																												// nine!
-																												// Only
-																												// single
-																												// backslash!
+		// second token is 8-letter long, not nine! Only single backslash!
+		Token correctData[] = { new Token(TokenType.WORD, "ab12cd3"), new Token(TokenType.WORD, "ab21cd4\\"),
 				new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
@@ -148,10 +142,9 @@ public class Prob1Test {
 		Lexer lexer = new Lexer("  ab\\123cd ab\\2\\1cd\\4\\\\ \r\n\t   ");
 
 		// We expect following stream of tokens
+		// fourth token is 8-letter long, not nine! Only single backslash!
 		Token correctData[] = { new Token(TokenType.WORD, "ab1"), new Token(TokenType.NUMBER, Long.valueOf(23)),
-				new Token(TokenType.WORD, "cd"), new Token(TokenType.WORD, "ab21cd4\\"), // this is 8-letter long, not
-																							// nine! Only single
-																							// backslash!
+				new Token(TokenType.WORD, "cd"), new Token(TokenType.WORD, "ab21cd4\\"),
 				new Token(TokenType.EOF, null) };
 
 		checkTokenStream(lexer, correctData);
