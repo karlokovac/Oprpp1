@@ -5,6 +5,9 @@ import static java.util.Objects.requireNonNull;
 
 /** Performs lexical analysis on provided <code>String</code> */
 public class Lexer {
+	private static final String NULL_TEXT_MSG = "Can't pass null reference for text.";
+	private static final String LEXER_NULL_REF = "Can't pass null reference for LexerState";
+
 	/** Data given for lexical analysis */
 	private final char[] data;
 	// ** Last extracted Token */
@@ -21,7 +24,7 @@ public class Lexer {
 	 * @throws NullPointerException if null is passed
 	 */
 	public Lexer(String text) {
-		requireNonNull(text);
+		requireNonNull(text, NULL_TEXT_MSG);
 		data = text.toCharArray();
 		state = LexerState.BASIC;
 	}
@@ -53,7 +56,7 @@ public class Lexer {
 	 * @param state
 	 */
 	public void setState(LexerState state) {
-		requireNonNull(state);
+		requireNonNull(state, LEXER_NULL_REF);
 		this.state = state;
 	}
 
@@ -123,7 +126,7 @@ public class Lexer {
 			extractSymbol();
 			return;
 		}
-		int start = currentIndex;
+		final int start = currentIndex;
 		do {
 			currentIndex++;
 		} while (currentIndex < data.length && !isBlank(currentChar()) && currentChar() != '#');

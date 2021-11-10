@@ -1,16 +1,10 @@
 package hr.fer.oprpp1.hw02.prob1;
 
-/**
- * Models token to be generated during lexical analysis of text
- */
+/** Models token to be generated during lexical analysis of text */
 public class Token {
-	/**
-	 * Type of token
-	 */
+	/** Type of token */
 	private final TokenType type;
-	/**
-	 * value stored in token
-	 */
+	/** value stored in token */
 	private final Object value;
 
 	/**
