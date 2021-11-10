@@ -1,8 +1,6 @@
 package hr.fer.oprpp1.custom.collections;
 
-/**
- * Interface that defines behavior of iterating over elements of collection
- */
+/** Interface that defines behavior of iterating over elements of collection */
 public interface ElementsGetter {
 	/**
 	 * Method that checks is there more elements to iterate over

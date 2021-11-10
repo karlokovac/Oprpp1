@@ -3,18 +3,13 @@ package hr.fer.oprpp1.custom.collections;
 public interface Collection {
 
 	/**
-	 * Size constant which represents empty <code>Collection</code>
-	 */
-	int EMPTY = 0;
-
-	/**
 	 * Returns <code>true</code> if collection contains no objects and
 	 * <code>false</code> otherwise
 	 * 
 	 * @return boolean state
 	 */
 	default boolean isEmpty() {
-		return size() == EMPTY;
+		return size() == 0;
 	}
 
 	/**
@@ -66,8 +61,7 @@ public interface Collection {
 	 * @param processor <code>Processor</code> to be used
 	 */
 	default void forEach(Processor processor) {
-		ElementsGetter getter = createElementsGetter();
-		while (getter.hasNextElement())
+		for (var getter = createElementsGetter(); getter.hasNextElement();)
 			processor.process(getter.getNextElement());
 	}
 
@@ -81,9 +75,7 @@ public interface Collection {
 		other.forEach((value) -> add(value));
 	}
 
-	/**
-	 * Removes all elements from this collection
-	 */
+	/** Removes all elements from this collection */
 	void clear();
 
 	/**
