@@ -5,9 +5,7 @@ import static java.util.Objects.requireNonNull;
 
 public class LinkedListIndexedCollection extends Collection {
 
-	/**
-	 * Element of linked list
-	 */
+	/** Element of linked list */
 	private static class ListNode {
 		private ListNode previous;
 		private ListNode next;
@@ -20,27 +18,19 @@ public class LinkedListIndexedCollection extends Collection {
 		}
 	}
 
-	/**
-	 * Constant indicating value isn't found
-	 */
+	/** Constant indicating value isn't found */
 	private static final int VALUE_IS_NOT_FOUND = -1;
+	private static final String NULL_REF_COLLECTION_MSG = "Collection can't be a null reference";
+	private static final String NULL_REF_VAL_MSG = "Value can't be null reference";
 
-	/**
-	 * Current size of collection
-	 */
+	/** Current size of collection */
 	private int size;
-	/**
-	 * Reference to the first node of the linked list
-	 */
+	/** Reference to the first node of the linked list */
 	private ListNode first;
-	/**
-	 * Reference to the last node of the linked list
-	 */
+	/** Reference to the last node of the linked list */
 	private ListNode last;
 
-	/**
-	 * Default constructor
-	 */
+	/** Default constructor */
 	public LinkedListIndexedCollection() {
 		size = 0;
 		first = null;
@@ -55,16 +45,14 @@ public class LinkedListIndexedCollection extends Collection {
 	 */
 	public LinkedListIndexedCollection(Collection other) {
 		this();
-		requireNonNull(other);
+		requireNonNull(other, NULL_REF_COLLECTION_MSG);
 		addAll(other);
 	}
 
-	/**
-	 * @throws NullPointerException if <code>value</code> is <code>null</code>
-	 */
+	/** @throws NullPointerException if <code>value</code> is <code>null</code> */
 	@Override
 	public void add(Object value) {
-		requireNonNull(value);
+		requireNonNull(value, NULL_REF_VAL_MSG);
 		append(value);
 	}
 
@@ -98,7 +86,7 @@ public class LinkedListIndexedCollection extends Collection {
 	 * @throws IndexOutOfBoundsException if <code>position</code> is missused
 	 */
 	public void insert(Object value, int position) {
-		requireNonNull(value);
+		requireNonNull(value, NULL_REF_VAL_MSG);
 		checkIndex(position, size + 1);
 
 		if (position == size)
@@ -153,17 +141,16 @@ public class LinkedListIndexedCollection extends Collection {
 	@Override
 	public boolean remove(Object value) {
 		int index = indexOf(value);
-		if (index != VALUE_IS_NOT_FOUND) {
-			remove(index);
-			return true;
-		}
-		return false;
+		if (index == VALUE_IS_NOT_FOUND)
+			return false;
+		remove(index);
+		return true;
 	}
 
 	@Override
 	public Object[] toArray() {
-		Object[] array = new Object[size];
-		ListNode node = first;
+		var array = new Object[size];
+		var node = first;
 		for (int i = 0; i < size; i++, node = node.next)
 			array[i] = node.value;
 		return array;
@@ -171,9 +158,8 @@ public class LinkedListIndexedCollection extends Collection {
 
 	@Override
 	public void forEach(Processor processor) {
-		for (var node = first; node != null; node = node.next) {
+		for (var node = first; node != null; node = node.next)
 			processor.process(node.value);
-		}
 	}
 
 	/**
@@ -247,20 +233,21 @@ public class LinkedListIndexedCollection extends Collection {
 	 * @param node to be removed
 	 */
 	private void removeNode(ListNode node) {
-		if (size == 1)
+		if (size == 1) {
 			clear();
-		else {
-			if (node == first) {
-				node.next.previous = null;
-				first = node.next;
-			} else if (node == last) {
-				node.previous.next = null;
-				last = node.previous;
-			} else {
-				node.previous.next = node.next;
-				node.next.previous = node.previous;
-			}
-			size--;
+			return;
 		}
+
+		if (node == first) {
+			node.next.previous = null;
+			first = node.next;
+		} else if (node == last) {
+			node.previous.next = null;
+			last = node.previous;
+		} else {
+			node.previous.next = node.next;
+			node.next.previous = node.previous;
+		}
+		size--;
 	}
 }
