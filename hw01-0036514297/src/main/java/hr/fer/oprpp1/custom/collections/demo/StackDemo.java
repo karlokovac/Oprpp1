@@ -46,7 +46,7 @@ public class StackDemo {
 	 * Splits the input into tokens for parsing
 	 * 
 	 * @param input original string
-	 * @return tokenized string
+	 * @return tokens of a string
 	 */
 	private static String[] tokenize(String input) {
 		return input.trim().replaceAll(" +", " ").split(" ");

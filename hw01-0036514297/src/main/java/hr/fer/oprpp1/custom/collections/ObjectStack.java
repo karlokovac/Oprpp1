@@ -1,14 +1,10 @@
 package hr.fer.oprpp1.custom.collections;
 
 public class ObjectStack {
-	/**
-	 * Array used for internal storage of stack
-	 */
+	/** Array used for internal storage of stack */
 	private ArrayIndexedCollection internal;
 
-	/**
-	 * Default constructor
-	 */
+	/** Default constructor */
 	public ObjectStack() {
 		internal = new ArrayIndexedCollection();
 	}

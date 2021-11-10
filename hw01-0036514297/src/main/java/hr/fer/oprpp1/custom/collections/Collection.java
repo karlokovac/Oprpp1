@@ -2,11 +2,6 @@ package hr.fer.oprpp1.custom.collections;
 
 public class Collection {
 
-	/**
-	 * Size constant which represents empty <code>Collection</code>
-	 */
-	public static final int EMPTY = 0;
-
 	protected Collection() {
 	}
 
@@ -17,7 +12,7 @@ public class Collection {
 	 * @return boolean state
 	 */
 	public boolean isEmpty() {
-		return size() == EMPTY;
+		return size() == 0;
 	}
 
 	/**
@@ -26,7 +21,7 @@ public class Collection {
 	 * @return number of stored objects
 	 */
 	public int size() {
-		return EMPTY;
+		return 0;
 	}
 
 	/**
@@ -97,9 +92,7 @@ public class Collection {
 		other.forEach(adder);
 	}
 
-	/**
-	 * Removes all elements from this collection
-	 */
+	/** Removes all elements from this collection */
 	public void clear() {
 	}
 }
