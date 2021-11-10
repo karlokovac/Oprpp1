@@ -5,34 +5,26 @@ import java.util.Arrays;
 import static java.util.Objects.checkIndex;
 import static java.util.Objects.requireNonNull;
 
+/** Data structure for storying Objects in array */
 public class ArrayIndexedCollection extends Collection {
 
-	/**
-	 * Constant indicating no presence of value
-	 */
+	/** Constant indicating no presence of value */
 	private static final int VALUE_IS_NOT_FOUND = -1;
-	/**
-	 * Default size of internal array
-	 */
+	/** Default size of internal array */
 	private static final int DEFAULT_CAPACITY = 16;
-	/**
-	 * Minimal size of internal array
-	 */
+	/** Minimal size of internal array */
 	private static final int MIN_SIZE = 1;
-	
-	/**
-	 * Current size of collection
-	 */
-	private int size;
 
-	/**
-	 * An array of object references which length determines its current capacity
-	 */
+	private static final String INIT_CAP_TOO_SMALL_MSG = "Initial capacity can't be less than " + MIN_SIZE;
+	private static final String NULL_REF_COLLECTION_MSG = "Collection can't be a null reference";
+	private static final String NULL_REF_VAL_MSG = "Value can't be null reference";
+
+	/** Current size of collection */
+	private int size;
+	/** An array of object references */
 	private Object[] elements;
 
-	/**
-	 * Default constructor setting capacity to default size
-	 */
+	/** Default constructor setting capacity to default size */
 	public ArrayIndexedCollection() {
 		this(DEFAULT_CAPACITY);
 	}
@@ -44,7 +36,7 @@ public class ArrayIndexedCollection extends Collection {
 	 */
 	public ArrayIndexedCollection(int initialCapacity) {
 		if (initialCapacity < MIN_SIZE)
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(INIT_CAP_TOO_SMALL_MSG);
 		elements = new Object[initialCapacity];
 	}
 
@@ -66,19 +58,15 @@ public class ArrayIndexedCollection extends Collection {
 	 * @throws NullPointerException if <code>other</code> is null
 	 */
 	public ArrayIndexedCollection(Collection other, int initialCapacity) {
-		requireNonNull(other);
+		requireNonNull(other, NULL_REF_COLLECTION_MSG);
 		size = other.size();
 		elements = Arrays.copyOf(other.toArray(), Math.max(initialCapacity, size));
 	}
 
-	/**
-	 * @throws NullPointerException if <code>value</code> is <code>null</code>
-	 */
+	/** @throws NullPointerException if <code>value</code> is <code>null</code> */
 	@Override
 	public void add(Object value) {
-		requireNonNull(value);
-		reallocateIfFull();
-		elements[size++] = value;
+		insert(value, size);
 	}
 
 	/**
@@ -90,8 +78,7 @@ public class ArrayIndexedCollection extends Collection {
 	 * @throws IndexOutOfBoundsException if <code>index</code> is misused
 	 */
 	public Object get(int index) {
-		checkIndex(index, size);
-		return elements[index];
+		return elements[checkIndex(index, size)];
 	}
 
 	@Override
@@ -106,13 +93,12 @@ public class ArrayIndexedCollection extends Collection {
 	 * 
 	 * @param value    to be inserted
 	 * @param position to be placed at
-	 * @throws NullPointerException if <code>value</code> is <code>null</code>
+	 * @throws NullPointerException      if <code>value</code> is <code>null</code>
 	 * @throws IndexOutOfBoundsException if position is misused
 	 */
 	public void insert(Object value, int position) {
 		checkIndex(position, size + 1);
-		requireNonNull(value);
-		reallocateIfFull();
+		requireNonNull(value, NULL_REF_VAL_MSG);
 		shiftRightFrom(position);
 		elements[position] = value;
 		size++;
@@ -143,7 +129,6 @@ public class ArrayIndexedCollection extends Collection {
 	 */
 	public void remove(int index) {
 		checkIndex(index, size);
-		elements[index] = null;
 		shiftLeftFrom(index);
 		size--;
 	}
@@ -161,11 +146,10 @@ public class ArrayIndexedCollection extends Collection {
 	@Override
 	public boolean remove(Object value) {
 		int index = indexOf(value);
-		if (index != VALUE_IS_NOT_FOUND) {
-			remove(index);
-			return true;
-		}
-		return false;
+		if (index == VALUE_IS_NOT_FOUND)
+			return false;
+		remove(index);
+		return true;
 	}
 
 	@Override
@@ -179,34 +163,35 @@ public class ArrayIndexedCollection extends Collection {
 			processor.process(elements[i]);
 	}
 
-	/**
-	 * Duplicates backing array if it's full
-	 */
-	private void reallocateIfFull() {
+	/** Duplicates backing array if it's full */
+	private void checkSize() {
 		if (size == elements.length)
 			elements = Arrays.copyOf(elements, elements.length * 2);
 	}
 
 	/**
-	 * Shifts elements in the array to the right from the starting position to end
+	 * Shifts elements in the array to the right from the starting position to end.
+	 * If <code>elements</code> is full it duplicates the array so it wouldn't
+	 * assign out of bounds. This is ok since it is always used when filling array
 	 * 
 	 * @param position starting position
 	 */
 	private void shiftRightFrom(int position) {
-		for (int i = size; i > position; i--) {
+		checkSize();
+		for (int i = size; i > position; i--)
 			elements[i] = elements[i - 1];
-		}
 	}
 
 	/**
-	 * Shifts elements in the array to the left from the starting position to end
+	 * Shifts elements in the array to the left from the starting position to end.
+	 * <b>Overwrites</b> element at <code>position</code>
 	 * 
 	 * @param position starting position
 	 */
 	private void shiftLeftFrom(int position) {
-		for (int i = position; i < size; i++) {
-			elements[i] = elements[i + 1];
-		}
+		for (int i = position + 1; i < size; i++)
+			elements[i - 1] = elements[i];
+		elements[size - 1] = null;
 	}
 
 }

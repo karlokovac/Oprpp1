@@ -48,7 +48,7 @@ public class ArrayIndexedCollectionTest {
 			new ArrayIndexedCollection(null);
 		});
 	}
-	
+
 	@Test
 	public void testCollectionAndCapacityConstructor() {
 		var col = new ArrayIndexedCollection();
@@ -59,7 +59,7 @@ public class ArrayIndexedCollectionTest {
 		col.add(volkswagen);
 		col.add(mercedes);
 		col.add(bmw);
-		var collection = new ArrayIndexedCollection(col,0);
+		var collection = new ArrayIndexedCollection(col, 0);
 		assertArrayEquals(expected, collection.toArray());
 	}
 
@@ -145,6 +145,20 @@ public class ArrayIndexedCollectionTest {
 	@Test
 	public void testRemove() {
 		var collection = new ArrayIndexedCollection();
+		var tesla = "Tesla";
+		var rimac = "Rimac";
+		var porsche = "Porsche";
+		Object[] expected = new Object[] { rimac, porsche };
+		collection.add(tesla);
+		collection.add(rimac);
+		collection.add(porsche);
+		collection.remove(0);
+		assertArrayEquals(expected, collection.toArray());
+	}
+
+	@Test
+	public void testRemoveWhenFull() {
+		var collection = new ArrayIndexedCollection(3);
 		var tesla = "Tesla";
 		var rimac = "Rimac";
 		var porsche = "Porsche";
