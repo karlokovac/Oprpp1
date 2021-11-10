@@ -8,29 +8,19 @@ import java.util.NoSuchElementException;
 
 public class LinkedListIndexedCollection implements List {
 
-	/**
-	 * Constant indicating value isn't found
-	 */
-	private static final int VALUE_IS_NOT_FOUND = -1;
+	private static final String NULL_REF_COLLECTION_MSG = "Collection can't be a null reference";
+	private static final String NULL_REF_VAL_MSG = "Value can't be null reference";
 
-	/**
-	 * Current size of collection
-	 */
+	/** Current size of collection */
 	private int size;
-	/**
-	 * Reference to the first node of the linked list
-	 */
+	/** Reference to the first node of the linked list */
 	private ListNode first;
-	/**
-	 * Reference to the last node of the linked list
-	 */
+	/** Reference to the last node of the linked list */
 	private ListNode last;
 
 	private long modificationCount;
 
-	/**
-	 * Default constructor
-	 */
+	/** Default constructor */
 	public LinkedListIndexedCollection() {
 		size = 0;
 		first = null;
@@ -45,15 +35,15 @@ public class LinkedListIndexedCollection implements List {
 	 */
 	public LinkedListIndexedCollection(Collection other) {
 		this();
-		addAll(requireNonNull(other));
+		requireNonNull(other, NULL_REF_COLLECTION_MSG);
+		addAll(other);
 	}
 
-	/**
-	 * @throws NullPointerException if <code>value</code> is <code>null</code>
-	 */
+	/** @throws NullPointerException if <code>value</code> is <code>null</code> */
 	@Override
 	public void add(Object value) {
-		append(requireNonNull(value));
+		requireNonNull(value, NULL_REF_VAL_MSG);
+		append(value);
 	}
 
 	@Override
@@ -71,7 +61,7 @@ public class LinkedListIndexedCollection implements List {
 
 	@Override
 	public void insert(Object value, int position) {
-		requireNonNull(value);
+		requireNonNull(value, NULL_REF_VAL_MSG);
 		checkIndex(position, size + 1);
 
 		if (position == size)
@@ -91,7 +81,7 @@ public class LinkedListIndexedCollection implements List {
 				if (node.value.equals(value))
 					return i;
 		}
-		return VALUE_IS_NOT_FOUND;
+		return VALUE_NOT_FOUND;
 	}
 
 	@Override
@@ -106,17 +96,16 @@ public class LinkedListIndexedCollection implements List {
 
 	@Override
 	public boolean contains(Object value) {
-		return indexOf(value) != VALUE_IS_NOT_FOUND;
+		return indexOf(value) != VALUE_NOT_FOUND;
 	}
 
 	@Override
 	public boolean remove(Object value) {
 		int index = indexOf(value);
-		if (index != VALUE_IS_NOT_FOUND) {
-			remove(index);
-			return true;
-		}
-		return false;
+		if (index == VALUE_NOT_FOUND)
+			return false;
+		remove(index);
+		return true;
 	}
 
 	@Override
@@ -130,9 +119,8 @@ public class LinkedListIndexedCollection implements List {
 
 	@Override
 	public void forEach(Processor processor) {
-		for (var node = first; node != null; node = node.next) {
+		for (var node = first; node != null; node = node.next)
 			processor.process(node.value);
-		}
 	}
 
 	@Override
@@ -214,42 +202,26 @@ public class LinkedListIndexedCollection implements List {
 	 * @param node to be removed
 	 */
 	private void removeNode(ListNode node) {
-		if (size == 1)
+		if (size == 1) {
 			clear();
-		else {
-			if (node == first) {
-				node.next.previous = null;
-				first = node.next;
-			} else if (node == last) {
-				node.previous.next = null;
-				last = node.previous;
-			} else {
-				node.previous.next = node.next;
-				node.next.previous = node.previous;
-			}
-			size--;
+			return;
 		}
+
+		if (node == first) {
+			node.next.previous = null;
+			first = node.next;
+		} else if (node == last) {
+			node.previous.next = null;
+			last = node.previous;
+		} else {
+			node.previous.next = node.next;
+			node.next.previous = node.previous;
+		}
+		size--;
 		modificationCount++;
 	}
 
-	/**
-	 * Element of linked list
-	 */
-	private static class ListNode {
-		private ListNode previous;
-		private ListNode next;
-		private Object value;
-
-		public ListNode(ListNode prev, ListNode next, Object value) {
-			this.previous = prev;
-			this.next = next;
-			this.value = value;
-		}
-	}
-
-	/**
-	 * Implementation of ElementsGetter for {@link LinkedListIndexedCollection}
-	 */
+	/** Implementation of ElementsGetter for {@link LinkedListIndexedCollection} */
 	private static class Getter implements ElementsGetter {
 
 		private ListNode node;
@@ -263,40 +235,35 @@ public class LinkedListIndexedCollection implements List {
 
 		}
 
+		/** @throws ConcurrentModificationException if modification occured */
 		@Override
 		public boolean hasNextElement() {
+			if (savedModificationCount != collection.modificationCount)
+				throw new ConcurrentModificationException();
 			return node != null;
 		}
 
+		/** @throws NoSuchElementException if there is no next element */
 		@Override
 		public Object getNextElement() {
-			checkConcurrentModification();
-			checkNextElement();
+			if (!hasNextElement())
+				throw new NoSuchElementException();
 			var next = node;
 			node = node.next;
 			return next.value;
 		}
-
-		/**
-		 * Checks whether there is next element
-		 * 
-		 * @throws NoSuchElementException if there is no next element
-		 */
-		private void checkNextElement() {
-			if (!hasNextElement())
-				throw new NoSuchElementException();
-		}
-
-		/**
-		 * Checks whether <code>Collection</code> was modified during iteration
-		 * 
-		 * @throws ConcurrentModificationException if {@link Collection} was modified
-		 *                                         during iteration
-		 */
-		private void checkConcurrentModification() {
-			if (savedModificationCount != collection.modificationCount)
-				throw new ConcurrentModificationException();
-		}
 	}
 
+	/** Element of linked list */
+	private static class ListNode {
+		private ListNode previous;
+		private ListNode next;
+		private Object value;
+
+		public ListNode(ListNode prev, ListNode next, Object value) {
+			this.previous = prev;
+			this.next = next;
+			this.value = value;
+		}
+	}
 }
