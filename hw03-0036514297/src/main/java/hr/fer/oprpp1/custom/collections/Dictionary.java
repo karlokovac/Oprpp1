@@ -1,18 +1,17 @@
 package hr.fer.oprpp1.custom.collections;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 /** Data structure for storing key-value pairs */
 public class Dictionary<K, V> {
 
-	/** Index to signal value isn't found */
-	private final static int VALUE_NOT_FOUND = -1;
 	/** List adapted for internal storage */
-	private final List<Pair> internal;
+	private final List<Pair<K, V>> internalList;
 
 	/** Default constructor */
 	public Dictionary() {
-		internal = new LinkedListIndexedCollection<>();
+		internalList = new ArrayIndexedCollection<>();
 	}
 
 	/**
@@ -21,7 +20,7 @@ public class Dictionary<K, V> {
 	 * @return <code>true</code> if empty, <code>false</code> otherwise
 	 */
 	public boolean isEmpty() {
-		return internal.isEmpty();
+		return internalList.isEmpty();
 	}
 
 	/**
@@ -30,12 +29,12 @@ public class Dictionary<K, V> {
 	 * @return number of stored elements
 	 */
 	public int size() {
-		return internal.size();
+		return internalList.size();
 	}
 
 	/** Destroys all stored data */
 	public void clear() {
-		internal.clear();
+		internalList.clear();
 	}
 
 	/**
@@ -49,10 +48,10 @@ public class Dictionary<K, V> {
 	 */
 	public V put(K key, V value) {
 		Objects.requireNonNull(key, "Key musn't be null");
-		int index = indexOfKey(key);
-		if (index != VALUE_NOT_FOUND)
-			return internal.get(index).setValue(value);
-		internal.add(new Pair(key, value));
+		var overWritten = findKeyAndPreform(key, (pair) -> pair.setValue(value));
+		if (overWritten != null)
+			return overWritten;
+		internalList.add(new Pair<K, V>(key, value));
 		return null;
 	}
 
@@ -63,10 +62,7 @@ public class Dictionary<K, V> {
 	 * @return value if the key exists, <code>null</code> otherwise
 	 */
 	public V get(Object key) {
-		int index = indexOfKey(key);
-		if (index == VALUE_NOT_FOUND)
-			return null;
-		return internal.get(index).value;
+		return findKeyAndPreform(key, (pair) -> pair.value);
 	}
 
 	/**
@@ -76,29 +72,36 @@ public class Dictionary<K, V> {
 	 * @return value of removed Pair, <code>null</code> otherwise
 	 */
 	public V remove(K key) {
-		int index = indexOfKey(key);
-		if (index == VALUE_NOT_FOUND)
-			return null;
-		V stored = internal.get(index).value;
-		internal.remove(index);
-		return stored;
+		return findKeyAndPreform(key, (pair) -> {
+			final V value = pair.value;
+			internalList.remove(pair);
+			return value;
+		});
 	}
 
 	/**
-	 * Searches the index of the given key
+	 * Iterates over stored pairs until it finds the one with the matching key.If it
+	 * finds the matching key then it performs the action on it. Otherwise it
+	 * returns <code>null</code>
 	 * 
-	 * @param key to search for
-	 * @return index of the key, otherwise
+	 * @param key    to be searched
+	 * @param action to be performed
+	 * @return result of the performed function
 	 */
-	private int indexOfKey(Object key) {
-		for (int i = 0; i < internal.size(); i++)
-			if (internal.get(i).key.equals(key))
-				return i;
-		return VALUE_NOT_FOUND;
+	private V findKeyAndPreform(Object key, Function<Pair<K, V>, V> action) {
+		if (key == null)
+			return null;
+		var eg = internalList.createElementsGetter();
+		while (eg.hasNextElement()) {
+			var pair = eg.getNextElement();
+			if (pair.key.equals(key))
+				return action.apply(pair);
+		}
+		return null;
 	}
 
 	/** Data structure representing an entry */
-	private class Pair {
+	private static class Pair<K, V> {
 		private final K key;
 		private V value;
 
@@ -120,7 +123,7 @@ public class Dictionary<K, V> {
 		 * @return old value being overwritten
 		 */
 		public V setValue(V newValue) {
-			V oldValue = value;
+			final V oldValue = value;
 			value = newValue;
 			return oldValue;
 		}

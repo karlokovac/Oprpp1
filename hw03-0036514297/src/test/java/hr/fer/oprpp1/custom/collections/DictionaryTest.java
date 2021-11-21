@@ -32,6 +32,7 @@ public class DictionaryTest {
 		var actual = dictionary.put("Key", value);
 		assertEquals(null, actual);
 		assertEquals(value, dictionary.get("Key"));
+		assertEquals(1, dictionary.size());
 	}
 
 	@Test
@@ -40,6 +41,7 @@ public class DictionaryTest {
 		var value = "Value";
 		dictionary.put("Key", value);
 		assertEquals(value, dictionary.get("Key"));
+		assertEquals(1, dictionary.size());
 	}
 
 	@Test
