@@ -5,6 +5,7 @@ public class ConditionalExpression {
 	private final String stringLiteral;
 	private final IComparisonOperator comparisonOperator;
 
+	/** Constructs the expression */
 	public ConditionalExpression(IFieldValueGetter getter, String literal, IComparisonOperator operator) {
 		this.fieldGetter = getter;
 		this.stringLiteral = literal;

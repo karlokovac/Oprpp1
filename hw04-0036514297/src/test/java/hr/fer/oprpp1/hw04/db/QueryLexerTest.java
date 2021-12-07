@@ -10,7 +10,7 @@ public class QueryLexerTest {
 	@Test
 	public void testQuery() {
 		var lexer = new Lexer("query");
-		Token correctData[] = { new Token(TokenType.WORD, "query"), new Token(TokenType.EOF, null) };
+		Token[] correctData = { new Token(TokenType.WORD, "query"), new Token(TokenType.EOF, null) };
 		checkQueryTokenStream(lexer, correctData);
 
 	}
@@ -18,7 +18,7 @@ public class QueryLexerTest {
 	@Test
 	public void testDirectQuery() {
 		var lexer = new Lexer("query jmbag=\"0000000003\"");
-		Token correctData[] = { new Token(TokenType.WORD, "query"), new Token(TokenType.WORD, "jmbag"),
+		Token[] correctData = { new Token(TokenType.WORD, "query"), new Token(TokenType.WORD, "jmbag"),
 				new Token(TokenType.OPERATOR, "="), new Token(TokenType.QUOTED, "\"0000000003\""),
 				new Token(TokenType.EOF, null) };
 		checkQueryTokenStream(lexer, correctData);
@@ -27,7 +27,7 @@ public class QueryLexerTest {
 	@Test
 	public void testSpacesQuery() {
 		var lexer = new Lexer("query lastName =     \"Blažić\"");
-		Token correctData[] = { new Token(TokenType.WORD, "query"), new Token(TokenType.WORD, "lastName"),
+		Token[] correctData = { new Token(TokenType.WORD, "query"), new Token(TokenType.WORD, "lastName"),
 				new Token(TokenType.OPERATOR, "="), new Token(TokenType.QUOTED, "\"Blažić\""),
 				new Token(TokenType.EOF, null) };
 		checkQueryTokenStream(lexer, correctData);
@@ -36,7 +36,7 @@ public class QueryLexerTest {
 	@Test
 	public void testMultipleQuery() {
 		var lexer = new Lexer("query firstName>\"A\" and lastName LIKE \"B*ć\"");
-		Token correctData[] = { new Token(TokenType.WORD, "query"), new Token(TokenType.WORD, "firstName"),
+		Token[] correctData = { new Token(TokenType.WORD, "query"), new Token(TokenType.WORD, "firstName"),
 				new Token(TokenType.OPERATOR, ">"), new Token(TokenType.QUOTED, "\"A\""),
 				new Token(TokenType.WORD, "and"), new Token(TokenType.WORD, "lastName"),
 				new Token(TokenType.WORD, "LIKE"), new Token(TokenType.QUOTED, "\"B*ć\""),
@@ -48,7 +48,7 @@ public class QueryLexerTest {
 	public void testHugeQuery() {
 		var lexer = new Lexer(
 				"query firstName>\"A\" and firstName<\"C\" and lastName LIKE \"B*ć\" and jmbag>\"0000000002\"");
-		Token correctData[] = { new Token(TokenType.WORD, "query"), new Token(TokenType.WORD, "firstName"),
+		Token[] correctData = { new Token(TokenType.WORD, "query"), new Token(TokenType.WORD, "firstName"),
 				new Token(TokenType.OPERATOR, ">"), new Token(TokenType.QUOTED, "\"A\""),
 				new Token(TokenType.WORD, "and"), new Token(TokenType.WORD, "firstName"),
 				new Token(TokenType.OPERATOR, "<"), new Token(TokenType.QUOTED, "\"C\""),
@@ -69,7 +69,7 @@ public class QueryLexerTest {
 	@Test
 	public void testEmpty() {
 		Lexer lexer = new Lexer("");
-		assertEquals(TokenType.EOF, lexer.nextToken().getType(), "Empty input must generate only EOF token.");
+		assertEquals(TokenType.EOF, lexer.nextToken().type(), "Empty input must generate only EOF token.");
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class QueryLexerTest {
 	public void testNoActualContent() {
 		// When input is only of spaces, tabs, newlines, etc...
 		Lexer lexer = new Lexer("   \t    ");
-		assertEquals(TokenType.EOF, lexer.nextToken().getType(),
+		assertEquals(TokenType.EOF, lexer.nextToken().type(),
 				"Input had no content. QueryLexer should generated only EOF token.");
 	}
 
@@ -96,20 +96,20 @@ public class QueryLexerTest {
 		// Lets check for several words...
 		Lexer lexer = new Lexer("  Štefanija Automobil   ");
 		// We expect the following stream of tokens
-		Token correctData[] = { new Token(TokenType.WORD, "Štefanija"), new Token(TokenType.WORD, "Automobil"),
+		Token[] correctData = { new Token(TokenType.WORD, "Štefanija"), new Token(TokenType.WORD, "Automobil"),
 				new Token(TokenType.EOF, null) };
 		checkQueryTokenStream(lexer, correctData);
 	}
 
 	// Helper method for checking if lexer generates the same stream of tokens
-	// as the given stream.
+	// as the given stream.	
 	private void checkQueryTokenStream(Lexer lexer, Token[] correctData) {
 		int counter = 0;
 		for (Token expected : correctData) {
 			Token actual = lexer.nextToken();
 			String msg = "Checking token " + counter + ":";
-			assertEquals(expected.getType(), actual.getType(), msg);
-			assertEquals(expected.getValue(), actual.getValue(), msg);
+			assertEquals(expected.type(), actual.type(), msg);
+			assertEquals(expected.value(), actual.value(), msg);
 			counter++;
 		}
 	}

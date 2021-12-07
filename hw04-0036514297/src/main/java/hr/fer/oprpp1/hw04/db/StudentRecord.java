@@ -10,6 +10,15 @@ public class StudentRecord {
 	private final String lastName;
 	private final int finalGrade;
 
+	/**
+	 * Constructs the StudentRecord
+	 * 
+	 * @param jmbag
+	 * @param firstName
+	 * @param lastName
+	 * @param finalGrade
+	 * @throws FinalGradeException if finalGrade is invalid
+	 */
 	public StudentRecord(String jmbag, String firstName, String lastName, int finalGrade) {
 		super();
 		this.jmbag = jmbag;

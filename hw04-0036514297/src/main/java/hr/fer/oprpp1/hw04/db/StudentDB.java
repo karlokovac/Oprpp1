@@ -7,8 +7,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
+/** Entering program */
 public class StudentDB {
 
+	/** Reference to database instance */
 	private static StudentDatabase database;
 
 	public static void main(String[] args) {
@@ -17,17 +19,19 @@ public class StudentDB {
 		for (var line = readFromConsole(sc); !"exit".equalsIgnoreCase(line); line = readFromConsole(sc)) {
 			QueryParser parser = parse(line);
 			if (parser != null)
-				outputResult(parser);
+				queryAndOutput(parser);
 		}
 		sc.close();
 		System.out.println("Goodbye!");
 	}
 
+	/** Prompts the user to enter commands */
 	private static String readFromConsole(Scanner sc) {
 		System.out.print("> ");
 		return sc.nextLine();
 	}
 
+	/** Takes input string and parses it */
 	private static QueryParser parse(String line) {
 		try {
 			return new QueryParser(line);
@@ -37,7 +41,12 @@ public class StudentDB {
 		return null;
 	}
 
-	private static void outputResult(QueryParser parser) {
+	/**
+	 * Queries the database and outputs result to console
+	 * 
+	 * @param parser to extract query from
+	 */
+	private static void queryAndOutput(QueryParser parser) {
 		List<StudentRecord> records;
 		if (parser.isDirectQuery()) {
 			System.out.println("Using index for record retrieval.");
@@ -47,6 +56,11 @@ public class StudentDB {
 		RecordFormatter.format(records).forEach(System.out::println);
 	}
 
+	/**
+	 * Reads data from database file and parses it to a list
+	 * 
+	 * @return string list
+	 */
 	private static List<String> loadFileLines() {
 		try {
 			return Files.readAllLines(Paths.get("./database.txt"), StandardCharsets.UTF_8);
@@ -57,6 +71,11 @@ public class StudentDB {
 		return null;
 	}
 
+	/**
+	 * Inputs list elements into the database
+	 * 
+	 * @param inputFileLines lines from the input file
+	 */
 	private static void loadDatabase(List<String> inputFileLines) {
 		try {
 			database = new StudentDatabase(inputFileLines);

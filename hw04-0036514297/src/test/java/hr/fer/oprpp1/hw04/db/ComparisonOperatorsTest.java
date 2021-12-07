@@ -44,6 +44,7 @@ public class ComparisonOperatorsTest {
 		assertFalse(ComparisonOperators.LIKE.satisfied("Zagreb", "Aba*"));
 		assertFalse(ComparisonOperators.LIKE.satisfied("AAA", "AA*AA"));
 		assertTrue(ComparisonOperators.LIKE.satisfied("AAAA", "AA*AA"));
+		assertTrue(ComparisonOperators.LIKE.satisfied("AAbAA", "AA*AA"));
 		assertTrue(ComparisonOperators.LIKE.satisfied("Ban", "B*"));
 		assertTrue(ComparisonOperators.LIKE.satisfied("0035", "0*5"));
 	}

@@ -6,9 +6,4 @@ public class MultipleWildcardException extends LexerException {
 		super(msg);
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 }

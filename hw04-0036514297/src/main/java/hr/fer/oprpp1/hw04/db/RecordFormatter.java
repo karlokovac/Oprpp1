@@ -10,6 +10,12 @@ public class RecordFormatter {
 	private final static String JMBAG_DASHES = "=".repeat(JMBAG_LENGTH + 2);
 	private final static String FINAL_GRADE_DASHES = "=".repeat(FINAL_GRADE_LENGTH + 2);
 
+	/**
+	 * Produces the output from given records
+	 * 
+	 * @param records to output
+	 * @return output list
+	 */
 	public static List<String> format(List<StudentRecord> records) {
 		if (records.size() == 0)
 			return List.of("Records selected: 0");
@@ -31,6 +37,7 @@ public class RecordFormatter {
 		return output;
 	}
 
+	/** Structure used to extract longest names lengths */
 	private static class LongestNames {
 		public int firstName = 0;
 		public int lastName = 0;

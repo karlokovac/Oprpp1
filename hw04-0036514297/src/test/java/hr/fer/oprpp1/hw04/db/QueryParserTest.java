@@ -1,12 +1,10 @@
 package hr.fer.oprpp1.hw04.db;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class QueryParserTest {
 
@@ -32,7 +30,7 @@ public class QueryParserTest {
 	@Test
 	public void testLastNameQuery() {
 		var parser = new QueryParser("query lastName =     \"Blažić\"");
-		assertTrue(!parser.isDirectQuery());
+		assertFalse(parser.isDirectQuery());
 		checkExpressions(
 				List.of(new ConditionalExpression(FieldValueGetters.LAST_NAME, "Blažić", ComparisonOperators.EQUALS)),
 				parser.getQuery());

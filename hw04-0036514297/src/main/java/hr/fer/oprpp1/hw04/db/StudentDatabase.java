@@ -10,9 +10,12 @@ public class StudentDatabase {
 
 	private static final String SAME_JMBAG_MSG = "Student with same JMBAG already exists ";
 
-	private List<StudentRecord> internalList;
-	private Map<String, StudentRecord> index;
+	/** List of all stored records */
+	private final List<StudentRecord> internalList;
+	/** Structure for fast record retrieving */
+	private final Map<String, StudentRecord> index;
 
+	/** Initializes the database with given entry strings */
 	public StudentDatabase(List<String> databaseEntries) {
 		internalList = new ArrayList<>(databaseEntries.size());
 		index = new HashMap<>();
@@ -25,18 +28,31 @@ public class StudentDatabase {
 		}
 	}
 
+	/**
+	 * Retrieves the records using index
+	 * 
+	 * @param jmbag to search
+	 * @return record containing given jmbag
+	 */
 	public StudentRecord forJMBAG(String jmbag) {
 		return index.get(jmbag);
 	}
 
+	/**
+	 * Returns all records that pass the filter
+	 * 
+	 * @param filter to test records
+	 * @return list of records
+	 */
 	public List<StudentRecord> filter(IFilter filter) {
 		return internalList.stream().filter(filter::accepts).collect(Collectors.toList());
 	}
 
 	private static class StudentRecordParser {
-		public static final StudentRecord parseStudentRecord(String input) {
+		/** Constructs StudentRecords from given string entry */
+		public static StudentRecord parseStudentRecord(String input) {
 			String[] attributes = input.split("\t");
-			return new StudentRecord(attributes[0], attributes[2], attributes[1], Integer.valueOf(attributes[3]));
+			return new StudentRecord(attributes[0], attributes[2], attributes[1], Integer.parseInt(attributes[3]));
 		}
 	}
 }
